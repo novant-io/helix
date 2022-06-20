@@ -7,13 +7,20 @@
 //
 
 using concurrent
+using fanbars
+using util
 using web
 
 **
-** HelixRenderer manages rendering fanbars templates to 'res.out'.
+** HelixRenderer renders response output to 'res.out'.
 **
 class HelixRenderer
 {
+
+//////////////////////////////////////////////////////////////////////////
+// Construction
+//////////////////////////////////////////////////////////////////////////
+
   ** Constructor.
   new make(HelixController controller)
   {
@@ -32,38 +39,90 @@ class HelixRenderer
   ** Convenience for 'controller.res'.
   WebRes res() { controller.res }
 
-  ** Render the given template and data to response.  The 'name'
+  ** Status code for response.
+  Int statusCode := 200
+
+//////////////////////////////////////////////////////////////////////////
+// Render
+//////////////////////////////////////////////////////////////////////////
+
+  ** Render the given text to 'res.out' using content
+  ** type '"text/plain; charset=UTF-8"'.
+  virtual Void renderText(Str text)
+  {
+    res.statusCode = this.statusCode
+    res.headers["Content-Type"] = "text/plain; charset=UTF-8"
+    setupGzip.print(text).flush.close
+  }
+
+  ** Render the given text to 'res.out' using content
+  ** type '"application/json; charset=UTF-8"'.
+  virtual Void renderJson(Obj obj)
+  {
+    res.statusCode = this.statusCode
+    res.headers["Content-Type"] = "application/json; charset=UTF-8"
+    out := setupGzip
+    JsonOutStream(out).writeJson(obj )
+    out.printLine.flush.close
+  }
+
+  ** Render given inline template and data to 'res.out' using
+  ** content type '"text/html; charset=UTF-8"'.
+  virtual Void renderInline(Str template, Str:Obj? data)
+  {
+    res.statusCode = this.statusCode
+    res.headers["Content-Type"] = "text/html; charset=UTF-8"
+    out := setupGzip
+    Fanbars.compile(template).render(out, data)
+    out.flush.close
+  }
+
+  ** Render the given template and data to 'res.out'. The 'name'
   ** may be fully qualified 'qname', or if no pod is specified
-  ** defaults to pod of this controller subclass.
-  virtual Void render(Str name, Str:Obj? data)
+  ** defaults to pod of this controller subclass.  The content
+  ** type will be '"text/html; charset=UTF-8"'.
+  virtual Void renderTemplate(Str name, Str:Obj? data)
   {
     // resolve qname
     qname := name.index("::") == null
       ? "${controller.typeof.pod.name}::${name}"
       : name
 
-    // setup response if not already commited
-    if (!res.isCommitted)
-    {
-      res.statusCode              = data["hx_status_code"]  ?: 200
-      res.headers["Content-Type"] = data["hx_content_type"] ?: "text/html; charset=UTF-8"
-    }
-
-    // render to res.out
-    out := res.out
+    res.statusCode = this.statusCode
+    res.headers["Content-Type"] = "text/html; charset=UTF-8"
+    out := setupGzip
     mod.template(qname).render(out, data)
-    out.flush
+    out.flush.close
   }
 
-  virtual Void renderInline() {}
+  // TODO
+  // virtual Void renderErr(Int code)
+  // {
+  //   // TODO err-{code}
+  //   // fallback to generic err.fbs ?
+  // }
 
-  virtual Void renderText() {}
+//////////////////////////////////////////////////////////////////////////
+// Response Setup
+//////////////////////////////////////////////////////////////////////////
 
-  virtual Void renderJson() {}
-
-  virtual Void renderErr(Int code)
+  ** Setup the response for gzip compression if supported
+  ** and return the appropriate OutStream instance to use.
+  ** You must call 'out.close' to properly encode response
+  ** if gzip is available and enabled.
+  OutStream setupGzip()
   {
-    // TODO err-{code}
-    // fallback to generic err.fbs ?
+    // check if client supports gzip and file has text/* MIME type
+    // and if so send the file using gzip compression (we don't
+    // know content length in this case)
+    ae := req.headers["Accept-Encoding"] ?: ""
+    if (WebUtil.parseQVals(ae)["gzip"] > 0f)
+    {
+      res.headers["Content-Encoding"] = "gzip"
+      return Zip.gzipOutStream(res.out)
+    }
+
+    // if compression is not supported return 'res.out'
+    return res.out
   }
 }

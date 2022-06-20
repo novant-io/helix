@@ -32,16 +32,28 @@ abstract class HelixTest : Test
     this.wisp?.stop
   }
 
-  ** Send a GET request to running TestMod and return response text.
-  Str sendGet(Uri uri)
+  ** Get WebClient for URI on localhost.
+  WebClient client(Uri uri)
   {
-    WebClient(`http://localhost:${port}` + uri).getStr
+    WebClient(`http://localhost:${port}` + uri)
   }
 
-  ** Convenience for 'verifyEq(sendGet(uri), test)'.
-  Void verifyGet(Uri uri, Str test)
+  ** Verify `sendGet` headers and content.
+  Void verifyGet(Uri uri, Str:Str headers, Str content)
   {
-    verifyEq(sendGet(uri), test)
+    // gzip enabled
+    c := client(uri).writeReq.readRes
+    headers.each |v,n| { verifyEq(v, c.resHeaders[n]) }
+    verifyEq(c.resHeaders["Content-Encoding"], "gzip")
+    verifyEq(content, c.resStr)
+
+    // gzip disabled
+    c = client(uri)
+    c.reqHeaders.remove("Accept-Encoding")
+    c.writeReq.readRes
+    headers.each |v,n| { verifyEq(v, c.resHeaders[n]) }
+    verifyEq(c.resHeaders["Content-Encoding"], null)
+    verifyEq(content, c.resStr)
   }
 
   private WispService? wisp

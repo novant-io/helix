@@ -19,6 +19,14 @@ const class TestMod : HelixMod
   {
     this.router = Router {
       it.routes = [
+        // text
+        Route("/text/a", "GET", TestController#textA),
+        Route("/text/b", "GET", TestController#textB),
+
+        // json
+        // TODO
+
+        // html
         Route("/", "GET", TestController#index),
       ]
     }
@@ -31,5 +39,13 @@ const class TestMod : HelixMod
 
 class TestController : HelixController
 {
-  Void index() { renderer.render("test-index", [:]) }
+  // text
+  Void textA() { renderer.renderText("plain-text-a") }
+  Void textB() { renderer.renderText("plain-text-b") }
+
+  // json
+  // TODO
+
+  // templates
+  Void index() { renderer.renderTemplate("test-index", [:]) }
 }
