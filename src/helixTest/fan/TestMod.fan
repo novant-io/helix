@@ -24,7 +24,9 @@ const class TestMod : HelixMod
         Route("/text/b", "GET", TestController#textB),
 
         // json
-        // TODO
+        Route("/json/str",  "GET", TestController#jsonStr),
+        Route("/json/num",  "GET", TestController#jsonNum),
+        Route("/json/bool", "GET", TestController#jsonBool),
 
         // html
         Route("/", "GET", TestController#index),
@@ -44,7 +46,9 @@ class TestController : HelixController
   Void textB() { renderer.renderText("plain-text-b") }
 
   // json
-  // TODO
+  Void jsonStr()  { renderer.renderJson("json-str") }
+  Void jsonNum()  { renderer.renderJson(45) }
+  Void jsonBool() { renderer.renderJson(true) }
 
   // templates
   Void index() { renderer.renderTemplate("test-index", [:]) }
