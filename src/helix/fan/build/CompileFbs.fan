@@ -27,9 +27,6 @@ internal class CompileFbs : Task
   {
     try
     {
-      // short-circuit if no template dirs
-      if ((helix.fbsDirs ?: Uri#.emptyList).isEmpty) return
-
       log.info("Templates [$helix.podName]")
       log.indent
 
