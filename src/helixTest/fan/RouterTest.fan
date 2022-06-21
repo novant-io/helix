@@ -56,6 +56,53 @@ class RouterTest : Test
   }
 
 //////////////////////////////////////////////////////////////////////////
+// Args
+//////////////////////////////////////////////////////////////////////////
+
+  Void testArgs()
+  {
+    r := Route("/foo/{arg}", "GET", RouterTestController#arg)
+    verifyRoute(r, `/foo/123`, "GET", Str:Str["arg":"123"])
+    verifyRoute(r, `/foo/abc`, "GET", Str:Str["arg":"abc"])
+    verifyRoute(r, `/foo/ax9`, "GET", Str:Str["arg":"ax9"])
+    verifyRoute(r, `/foo/_4b`, "GET", Str:Str["arg":"_4b"])
+
+    r = Route("/foo/{a}/bar/{b}/list", "GET", RouterTestController#arg)
+    verifyRoute(r, `/foo/123/bar/abc/list`, "GET", Str:Str["a":"123", "b":"abc"])
+    verifyRoute(r, `/foo/123/bax/abc/list`, "GET", null)
+  }
+
+//////////////////////////////////////////////////////////////////////////
+// Varargs
+//////////////////////////////////////////////////////////////////////////
+
+  Void testVararg()
+  {
+    r := Route("/foo/*", "GET", RouterTestController#varargs)
+    verifyRoute(r, `/foo/x`,     "GET", Str:Str[:])
+    verifyRoute(r, `/foo/x/y`,   "GET", Str:Str[:])
+    verifyRoute(r, `/foo/x/y/z`, "GET", Str:Str[:])
+    verifyRoute(r, `/fox/x/y/z`, "GET", null)
+
+    r = Route("/foo/{bar}/*", "GET", RouterTestController#varargs)
+    verifyRoute(r, `/foo/x/y`,     "GET", Str:Str["bar":"x"])
+    verifyRoute(r, `/foo/x/y/z`,   "GET", Str:Str["bar":"x"])
+    verifyRoute(r, `/foo/x/y/z/5`, "GET", Str:Str["bar":"x"])
+    verifyRoute(r, `/fox/x/y/z`,   "GET", null)
+
+    r = Route("/x/y/z/*", "GET", RouterTestController#varargs)
+    verifyRoute(r, `/x`,         "GET", null)
+    verifyRoute(r, `/x/y`,       "GET", null)
+    verifyRoute(r, `/x/y/z`,     "GET", null)
+    verifyRoute(r, `/x/y/z/foo`, "GET", Str:Str[:])
+    verifyRoute(r, `/x/y/z/foo/a/b/c`, "GET", Str:Str[:])
+
+    // errs
+    verifyErr(ArgErr#) { x := Route("/foo/*/*", "GET", RouterTestController#varargs) }
+    verifyErr(ArgErr#) { x := Route("/*/foo",   "GET", RouterTestController#varargs) }
+  }
+
+//////////////////////////////////////////////////////////////////////////
 // Support
 //////////////////////////////////////////////////////////////////////////
 
@@ -76,5 +123,7 @@ internal class RouterTestController : HelixController
 {
   Void index()   {}
   Void literal() {}
+  Void arg()     {}
+  Void varargs() {}
   Void err()     {}
 }
