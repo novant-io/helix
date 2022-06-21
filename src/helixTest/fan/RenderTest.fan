@@ -61,6 +61,13 @@ class RenderTest : HelixTest
 // Templates
 //////////////////////////////////////////////////////////////////////////
 
+  Void testRenderInline()
+  {
+    h := ["Content-Type":"text/html; charset=UTF-8"]
+    verifyGet(`/inline/a`, h, "inline-literal")
+    verifyGet(`/inline/b`, h, "inline-simple [abc-543]")
+  }
+
   Void testRenderTemplate()
   {
     h := ["Content-Type":"text/html; charset=UTF-8"]

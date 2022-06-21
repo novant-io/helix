@@ -28,7 +28,11 @@ const class TestMod : HelixMod
         Route("/json/num",  "GET", TestController#jsonNum),
         Route("/json/bool", "GET", TestController#jsonBool),
 
-        // html
+        // inline
+        Route("/inline/a", "GET", TestController#inlineA),
+        Route("/inline/b", "GET", TestController#inlineB),
+
+        // templates
         Route("/",       "GET", TestController#index),
         Route("/simple", "GET", TestController#simple),
       ]
@@ -50,6 +54,10 @@ class TestController : HelixController
   Void jsonStr()  { renderer.renderJson("json-str") }
   Void jsonNum()  { renderer.renderJson(45) }
   Void jsonBool() { renderer.renderJson(true) }
+
+  // inline
+  Void inlineA() { renderer.renderInline("inline-literal", [:]) }
+  Void inlineB() { renderer.renderInline("inline-simple [{{foo}}]", ["foo":"abc-543"]) }
 
   // templates
   Void index()  { renderer.renderTemplate("test-index", [:]) }
