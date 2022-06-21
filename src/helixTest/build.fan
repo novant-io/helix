@@ -19,9 +19,10 @@ class Build : BuildHelixPod
       "repo.public":  "true",
       "repo.tags":    "web",
     ]
-    depends = ["sys 1.0", "concurrent 1.0", "web 1.0", "webmod 1.0", "wisp 1.0", "helix 0+"]
-    srcDirs = [`fan/`]
-    fbsDirs = [`fbs/`]
-    resDirs = [`res/fbs/`]
+    depends  = ["sys 1.0", "concurrent 1.0", "web 1.0", "webmod 1.0", "wisp 1.0", "helix 0+"]
+    srcDirs  = [`fan/`]
+    fassDirs = [`fass/`]
+    fbsDirs  = [`fbs/`]
+    resDirs  = [`res/fbs/`]
   }
 }

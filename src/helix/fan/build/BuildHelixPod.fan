@@ -15,6 +15,10 @@ using build
 abstract class BuildHelixPod : BuildPod
 {
   ** List of Uris relative to build script of directories containing
+  ** the fass style styles to compile to CSS.
+  Uri[]? fassDirs
+
+  ** List of Uris relative to build script of directories containing
   ** the Fanbar source templates to compile.
   Uri[]? fbsDirs
 
@@ -34,8 +38,18 @@ abstract class BuildHelixPod : BuildPod
     compileJava
     compileJni
     // compileDotnet
+    compileFass
     compileFbs
     log.unindent
+  }
+
+  ** Compile fass style sheets if `fassDirs` is configured.
+  @Target { help = "Compile fass style sheets" }
+  virtual Void compileFass()
+  {
+    // short-circuit if source dirs
+    fassDirs = this.fassDirs ?: Uri#.emptyList
+    if (fassDirs.size > 0) CompileFass(this).run
   }
 
   ** Compile Fanbar templates if `fbsDirs` is configured.
@@ -44,9 +58,6 @@ abstract class BuildHelixPod : BuildPod
   {
     // short-circuit if source dirs
     fbsDirs = this.fbsDirs ?: Uri#.emptyList
-    if (fbsDirs.isEmpty) return
-
-    // compile
-    CompileFbs(this).run
+    if (fbsDirs.size > 0) CompileFbs(this).run
   }
 }

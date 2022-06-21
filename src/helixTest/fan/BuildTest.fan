@@ -14,9 +14,15 @@ using web
 **
 class BuildTest : Test
 {
+  Void testFass()
+  {
+    verifyFile(`/css/test.css`)
+  }
+
   Void testFbs()
   {
     verifyFile(`/fbs/test-index.fbs`)
+    verifyFile(`/fbs/test-simple.fbs`)
   }
 
   private Void verifyFile(Uri uri)

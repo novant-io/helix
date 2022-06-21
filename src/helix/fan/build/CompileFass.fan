@@ -3,16 +3,16 @@
 // Licensed under the MIT License
 //
 // History:
-//   18 Jun 2022  Andy Frank  Creation
+//   21 Jun 2022  Andy Frank  Creation
 //
 
 using build
-using fanbars
+using fass
 
 **
-** Compile fanbar templates files.
+** Compile fass style sheets.
 **
-internal class CompileFbs : Task
+internal class CompileFass : Task
 {
   ** Constructor.
   new make(BuildHelixPod script) : super(script)
@@ -27,19 +27,19 @@ internal class CompileFbs : Task
   {
     try
     {
-      log.info("Templates [$helix.podName]")
+      log.info("StyleSheets [$helix.podName]")
       log.indent
 
-      fbsDirs := helix.fbsDirs.map |u| { helix.scriptDir + u }
-      tempDir := helix.scriptDir + `temp-fbs/`
-      outFbs  := tempDir + `fbs/`
-      jdk     := JdkTask(helix)
-      jarExe  := jdk.jarExe
-      podFile := helix.outPodDir.toFile + `${helix.podName}.pod`
+      fassDirs := helix.fassDirs.map |u| { helix.scriptDir + u }
+      tempDir  := helix.scriptDir + `temp-fass/`
+      outFass  := tempDir + `css/`
+      jdk      := JdkTask(helix)
+      jarExe   := jdk.jarExe
+      podFile  := helix.outPodDir.toFile + `${helix.podName}.pod`
 
       // find source templates
       files := Str:File[:]
-      fbsDirs.each |d| { findFiles(d, files) }
+      fassDirs.each |d| { findFiles(d, files) }
       log.info("FindSourceFiles [$files.size files]")
 
       // init fresh temp dir
@@ -54,8 +54,8 @@ internal class CompileFbs : Task
         {
           // TODO: this could be better
           // compile first to validate
-          x := Fanbars.compile(f)
-          f.copyTo(outFbs + `${f.name}`)
+          css := outFass + `${f.basename}.css`
+          Fass.compile(f.in, css.out)
         }
         catch (Err err)
         {
@@ -89,7 +89,7 @@ internal class CompileFbs : Task
   private Void findFiles(File file, Str:File map)
   {
     if (file.isDir) file.list.each |f| { findFiles(f, map) }
-    else if (file.ext == "fbs")
+    else if (file.ext == "fass")
     {
       key := file.name
       if (map[key] == null) map.add(key, file)
