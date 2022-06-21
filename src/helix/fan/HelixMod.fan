@@ -11,7 +11,7 @@ using web
 using webmod
 
 **
-** HelixMod
+** HelixMod is the base class for Helix framework WebMods.
 **
 abstract const class HelixMod : WebMod
 {
