@@ -29,7 +29,8 @@ const class TestMod : HelixMod
         Route("/json/bool", "GET", TestController#jsonBool),
 
         // html
-        Route("/", "GET", TestController#index),
+        Route("/",       "GET", TestController#index),
+        Route("/simple", "GET", TestController#simple),
       ]
     }
   }
@@ -51,5 +52,6 @@ class TestController : HelixController
   Void jsonBool() { renderer.renderJson(true) }
 
   // templates
-  Void index() { renderer.renderTemplate("test-index", [:]) }
+  Void index()  { renderer.renderTemplate("test-index", [:]) }
+  Void simple() { renderer.renderTemplate("test-simple", ["foo":"xyz-123"]) }
 }

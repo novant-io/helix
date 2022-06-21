@@ -7,6 +7,7 @@
 //
 
 using build
+using fanbars
 
 **
 ** Compile fanbar templates files.
@@ -49,12 +50,25 @@ internal class CompileFbs : Task
       tempDir.create
 
       // compile each template
+      failed := false
       files.each |f|
       {
-        // TODO FIXIT: verify template
-        // TODO FIXIT: merge partials
-        f.copyTo(outFbs + `${f.name}`)
+        try
+        {
+          // TODO: this could be better
+          // compile first to validate
+          x := Fanbars.compile(f)
+          f.copyTo(outFbs + `${f.name}`)
+        }
+        catch (Err err)
+        {
+          failed = true
+          echo("${f.osPath}: ${err.msg}")
+        }
       }
+
+      // bail if compiler error found
+      if (failed) throw FatalBuildErr()
 
       // append files to the pod zip (we use java's jar tool)
       // bump log level to hide Exec task log spam
@@ -68,7 +82,7 @@ internal class CompileFbs : Task
     }
     catch (Err err)
     {
-      throw fatal(err.msg)
+      throw err as FatalBuildErr ?: fatal(err.msg)
     }
   }
 

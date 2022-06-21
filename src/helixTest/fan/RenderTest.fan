@@ -64,6 +64,7 @@ class RenderTest : HelixTest
   Void testRenderTemplate()
   {
     h := ["Content-Type":"text/html; charset=UTF-8"]
-    verifyGet(`/`, h, "Test Index")
+    verifyGet(`/`,       h, "Test Index")
+    verifyGet(`/simple`, h, "Simple Test [xyz-123]")
   }
 }

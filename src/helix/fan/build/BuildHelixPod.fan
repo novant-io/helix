@@ -9,7 +9,8 @@
 using build
 
 **
-** TODO
+** BuildHelixPod adds additional configuration to 'BuildPod' for
+** compiling Helix web framework resources.
 **
 abstract class BuildHelixPod : BuildPod
 {
