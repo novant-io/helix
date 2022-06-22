@@ -68,7 +68,7 @@ class HelixRenderer
 
   ** Render given inline template and data to 'res.out' using
   ** content type '"text/html; charset=UTF-8"'.
-  virtual Void renderInline(Str template, Str:Obj? data)
+  virtual Void renderInline(Str template, Str:Obj? data := [:])
   {
     res.statusCode = this.statusCode
     res.headers["Content-Type"] = "text/html; charset=UTF-8"
@@ -81,7 +81,7 @@ class HelixRenderer
   ** may be fully qualified 'qname', or if no pod is specified
   ** defaults to pod of this controller subclass.  The content
   ** type will be '"text/html; charset=UTF-8"'.
-  virtual Void renderTemplate(Str name, Str:Obj? data)
+  virtual Void renderTemplate(Str name, Str:Obj? data := [:])
   {
     // resolve qname
     qname := name.index("::") == null

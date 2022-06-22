@@ -23,7 +23,8 @@ abstract const class HelixMod : WebMod
   ** Constructor.
   new make()
   {
-    router = Router { routes=Route#.emptyList }
+    this.router = Router { routes=Route#.emptyList }
+    this.log = HelixLog()
   }
 
   ** Router model.
@@ -63,7 +64,7 @@ abstract const class HelixMod : WebMod
     catch (Err err)
     {
       // TODO FIXIT
-      err.trace
+      log.trace("ERR: $req.uri", err)
     }
   }
 
@@ -91,4 +92,11 @@ abstract const class HelixMod : WebMod
 
   ** Template cache.
   private const TemplateCache tcache := TemplateCache()
+
+//////////////////////////////////////////////////////////////////////////
+// Logging
+//////////////////////////////////////////////////////////////////////////
+
+  // TODO: not sure how this works yet
+  internal const HelixLog log
 }
