@@ -22,16 +22,16 @@ class RenderTest : HelixTest
   Void testLookup()
   {
     // valid
-    verifyNotNull(mod.template("helixTest::test-index"))
+    verifyNotNull(mod.template("helixTest::test_index"))
 
     // invalid qname
-    verifyErr(ArgErr#) { x := mod.template("test-index") }
-    verifyErr(ArgErr#) { x := mod.template("helixTest:test-index") }
-    verifyErr(ArgErr#) { x := mod.template("helixTest::test-index.fbs") }
+    verifyErr(ArgErr#) { x := mod.template("test_index") }
+    verifyErr(ArgErr#) { x := mod.template("helixTest:test_index") }
+    verifyErr(ArgErr#) { x := mod.template("helixTest::test_index.fbs") }
 
     // file not found
-    verifyNull(mod.template("helixTest::not-found", false))
-    verifyErr(ArgErr#) { x := mod.template("helixTest::not-found") }
+    verifyNull(mod.template("helixTest::not_found", false))
+    verifyErr(ArgErr#) { x := mod.template("helixTest::not_found") }
   }
 
 //////////////////////////////////////////////////////////////////////////
@@ -73,5 +73,11 @@ class RenderTest : HelixTest
     h := ["Content-Type":"text/html; charset=UTF-8"]
     verifyGet(`/`,       h, "Test Index")
     verifyGet(`/simple`, h, "Simple Test [xyz-123]")
+  }
+
+  Void testRenderTemplatePartials()
+  {
+    h := ["Content-Type":"text/html; charset=UTF-8"]
+    verifyGet(`/partial`, h, "Partial Test: this is a partial!")
   }
 }

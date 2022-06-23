@@ -33,8 +33,9 @@ const class TestMod : HelixMod
         Route("/inline/b", "GET", TestController#inlineB),
 
         // templates
-        Route("/",       "GET", TestController#index),
-        Route("/simple", "GET", TestController#simple),
+        Route("/",        "GET", TestController#index),
+        Route("/simple",  "GET", TestController#simple),
+        Route("/partial", "GET", TestController#partial),
       ]
     }
   }
@@ -60,6 +61,7 @@ class TestController : HelixController
   Void inlineB() { renderer.renderInline("inline-simple [{{foo}}]", ["foo":"abc-543"]) }
 
   // templates
-  Void index()  { renderer.renderTemplate("test-index", [:]) }
-  Void simple() { renderer.renderTemplate("test-simple", ["foo":"xyz-123"]) }
+  Void index()   { renderer.renderTemplate("test_index", [:]) }
+  Void simple()  { renderer.renderTemplate("test_simple", ["foo":"xyz-123"]) }
+  Void partial() { renderer.renderTemplate("test_partial", [:]) }
 }

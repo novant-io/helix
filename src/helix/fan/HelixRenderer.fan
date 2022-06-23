@@ -83,15 +83,10 @@ class HelixRenderer
   ** type will be '"text/html; charset=UTF-8"'.
   virtual Void renderTemplate(Str name, Str:Obj? data := [:])
   {
-    // resolve qname
-    qname := name.index("::") == null
-      ? "${controller.typeof.pod.name}::${name}"
-      : name
-
     res.statusCode = this.statusCode
     res.headers["Content-Type"] = "text/html; charset=UTF-8"
     out := setupGzip
-    mod.template(qname).render(out, data)
+    template(name).render(out, data) |Str p->Fanbars| { template(p) }
     out.flush.close
   }
 
@@ -101,6 +96,15 @@ class HelixRenderer
   //   // TODO err-{code}
   //   // fallback to generic err.fbs ?
   // }
+
+  private Fanbars template(Str name)
+  {
+    // resolve qname
+    qname := name.index("::") == null
+      ? "${controller.typeof.pod.name}::${name}"
+      : name
+    return mod.template(qname)
+  }
 
 //////////////////////////////////////////////////////////////////////////
 // Response Setup

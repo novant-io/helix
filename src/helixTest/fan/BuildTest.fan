@@ -21,8 +21,8 @@ class BuildTest : Test
 
   Void testFbs()
   {
-    verifyFile(`/fbs/test-index.fbs`)
-    verifyFile(`/fbs/test-simple.fbs`)
+    verifyFile(`/fbs/test_index.fbs`)
+    verifyFile(`/fbs/test_simple.fbs`)
   }
 
   private Void verifyFile(Uri uri)
