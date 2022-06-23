@@ -26,7 +26,7 @@ class Build : build::BuildPod
       "web 1.0",
       "webmod 1.0",
       "fass 0.1",
-      "fanbars 0.11",
+      "fanbars 0.12+",
     ]
     srcDirs = [`fan/`, `fan/build/`]
     docApi  = true
