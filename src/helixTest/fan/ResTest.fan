@@ -24,6 +24,7 @@ class ResTest : HelixTest
     h := ["Content-Type":"text/css; charset=utf-8"]
     verifyGet(`/css/alpha.css`, h, "body {\n  color: #f00;\n}\n")
     verifyGet(`/css/beta.css`,  h, "h1 {\n  font-size: 32pt;\n}\n")
+    verify404(`/css/nope.css`)
 
     verifyGet(`/foo/bar/alpha.css`,  h, "body {\n  color: #f00;\n}\n")
     verify404(`/foo/bar/beta.css`)
