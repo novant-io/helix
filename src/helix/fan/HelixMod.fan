@@ -62,10 +62,17 @@ abstract const class HelixMod : WebMod
       // allow post-service
       onAfterService(match.args)
     }
+    catch (HelixErr err)
+    {
+      // TODO FIXIT
+      log.trace("ERR: $req.uri", err)
+      res.sendErr(err.errCode)
+    }
     catch (Err err)
     {
       // TODO FIXIT
       log.trace("ERR: $req.uri", err)
+      res.sendErr(500)
     }
   }
 
