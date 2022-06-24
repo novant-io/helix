@@ -52,8 +52,17 @@ abstract class HelixTest : Test
     c.reqHeaders.remove("Accept-Encoding")
     c.writeReq.readRes
     headers.each |v,n| { verifyEq(v, c.resHeaders[n]) }
+    verifyEq(c.resCode, 200)
     verifyEq(c.resHeaders["Content-Encoding"], null)
     verifyEq(content, c.resStr)
+  }
+
+  ** Verify a 404 response.
+  Void verify404(Uri uri)
+  {
+    c := client(uri).writeReq.readRes
+    // echo(c.resStr)
+    verifyEq(c.resCode, 404)
   }
 
   private WispService? wisp

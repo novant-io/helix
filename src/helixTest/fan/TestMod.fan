@@ -38,7 +38,8 @@ const class TestMod : HelixMod
         Route("/partial", "GET", TestController#partial),
 
         // resources
-        ResRoute("/css/*", ["helixTest/css/"])
+        ResRoute("/css/{file}",        [TestMod#.pod.file(`/css/`)]),
+        ResRoute("/foo/bar/alpha.css", [TestMod#.pod.file(`/css/alpha.css`)]),
       ]
     }
   }

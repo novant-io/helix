@@ -16,7 +16,8 @@ class BuildTest : Test
 {
   Void testFass()
   {
-    verifyFile(`/css/test.css`)
+    verifyFile(`/css/alpha.css`)
+    verifyFile(`/css/beta.css`)
   }
 
   Void testFbs()
