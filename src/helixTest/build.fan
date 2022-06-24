@@ -22,7 +22,7 @@ class Build : BuildHelixPod
     depends  = ["sys 1.0", "concurrent 1.0", "web 1.0", "webmod 1.0", "wisp 1.0", "helix 0+"]
     srcDirs  = [`fan/`]
     fassDirs = [`fass/`]
-    fbsDirs  = [`fbs/`]
+    fbsDirs  = [`fbs/`, `fbs/sub/`]
     resDirs  = [`res/fbs/`]
   }
 }

@@ -23,6 +23,7 @@ class BuildTest : Test
   {
     verifyFile(`/fbs/test_index.fbs`)
     verifyFile(`/fbs/test_simple.fbs`)
+    verifyFile(`/fbs/alpha.fbs`)
   }
 
   private Void verifyFile(Uri uri)

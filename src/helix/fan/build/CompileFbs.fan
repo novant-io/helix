@@ -88,7 +88,7 @@ internal class CompileFbs : Task
   ** Recursivly find all source files.
   private Void findFiles(File file, Str:File map)
   {
-    if (file.isDir) file.list.each |f| { findFiles(f, map) }
+    if (file.isDir) file.listFiles.each |f| { findFiles(f, map) }
     else if (file.ext == "fbs")
     {
       key := file.name
