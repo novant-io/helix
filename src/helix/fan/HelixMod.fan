@@ -47,6 +47,7 @@ abstract const class HelixMod : WebMod
       // match req to Route
       match := router.match(req.modRel, req.method)
       if (match == null) throw HelixErr(404)
+      req.stash["helix.route"] = match.route
 
       // allow pre-service
       onBeforeService(match.args)

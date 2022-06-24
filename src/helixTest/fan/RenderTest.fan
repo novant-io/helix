@@ -40,7 +40,7 @@ class RenderTest : HelixTest
 
   Void testRenderText()
   {
-    h := ["Content-Type":"text/plain; charset=UTF-8"]
+    h := ["Content-Type":"text/plain; charset=utf-8"]
     verifyGet(`/text/a`, h, "plain-text-a")
     verifyGet(`/text/b`, h, "plain-text-b")
   }
@@ -51,7 +51,7 @@ class RenderTest : HelixTest
 
   Void testRenderJson()
   {
-    h := ["Content-Type":"application/json; charset=UTF-8"]
+    h := ["Content-Type":"application/json; charset=utf-8"]
     verifyGet(`/json/str`,  h, "\"json-str\"\n")
     verifyGet(`/json/num`,  h, "45\n")
     verifyGet(`/json/bool`, h, "true\n")
@@ -63,21 +63,21 @@ class RenderTest : HelixTest
 
   Void testRenderInline()
   {
-    h := ["Content-Type":"text/html; charset=UTF-8"]
+    h := ["Content-Type":"text/html; charset=utf-8"]
     verifyGet(`/inline/a`, h, "inline-literal")
     verifyGet(`/inline/b`, h, "inline-simple [abc-543]")
   }
 
   Void testRenderTemplate()
   {
-    h := ["Content-Type":"text/html; charset=UTF-8"]
+    h := ["Content-Type":"text/html; charset=utf-8"]
     verifyGet(`/`,       h, "Test Index")
     verifyGet(`/simple`, h, "Simple Test [xyz-123]")
   }
 
   Void testRenderTemplatePartials()
   {
-    h := ["Content-Type":"text/html; charset=UTF-8"]
+    h := ["Content-Type":"text/html; charset=utf-8"]
     verifyGet(`/partial`, h, "Partial Test: this is a partial!")
   }
 }

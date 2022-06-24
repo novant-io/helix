@@ -47,31 +47,31 @@ class HelixRenderer
 //////////////////////////////////////////////////////////////////////////
 
   ** Render the given text to 'res.out' using content
-  ** type '"text/plain; charset=UTF-8"'.
+  ** type '"text/plain; charset=utf-8"'.
   virtual Void renderText(Str text)
   {
     res.statusCode = this.statusCode
-    res.headers["Content-Type"] = "text/plain; charset=UTF-8"
+    res.headers["Content-Type"] = "text/plain; charset=utf-8"
     setupGzip.print(text).flush.close
   }
 
   ** Render the given text to 'res.out' using content
-  ** type '"application/json; charset=UTF-8"'.
+  ** type '"application/json; charset=utf-8"'.
   virtual Void renderJson(Obj obj)
   {
     res.statusCode = this.statusCode
-    res.headers["Content-Type"] = "application/json; charset=UTF-8"
+    res.headers["Content-Type"] = "application/json; charset=utf-8"
     out := setupGzip
     JsonOutStream(out).writeJson(obj )
     out.printLine.flush.close
   }
 
   ** Render given inline template and data to 'res.out' using
-  ** content type '"text/html; charset=UTF-8"'.
+  ** content type '"text/html; charset=utf-8"'.
   virtual Void renderInline(Str template, Str:Obj? data := [:])
   {
     res.statusCode = this.statusCode
-    res.headers["Content-Type"] = "text/html; charset=UTF-8"
+    res.headers["Content-Type"] = "text/html; charset=utf-8"
     out := setupGzip
     Fanbars.compile(template).render(out, data)
     out.flush.close
@@ -80,11 +80,11 @@ class HelixRenderer
   ** Render the given template and data to 'res.out'. The 'name'
   ** may be fully qualified 'qname', or if no pod is specified
   ** defaults to pod of this controller subclass.  The content
-  ** type will be '"text/html; charset=UTF-8"'.
+  ** type will be '"text/html; charset=utf-8"'.
   virtual Void renderTemplate(Str name, Str:Obj? data := [:])
   {
     res.statusCode = this.statusCode
-    res.headers["Content-Type"] = "text/html; charset=UTF-8"
+    res.headers["Content-Type"] = "text/html; charset=utf-8"
     out := setupGzip
     template(name).render(out, data) |Str p->Fanbars| { template(p) }
     out.flush.close

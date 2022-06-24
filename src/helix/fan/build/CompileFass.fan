@@ -55,7 +55,9 @@ internal class CompileFass : Task
           // TODO: this could be better
           // compile first to validate
           css := outFass + `${f.basename}.css`
-          Fass.compile(f.in, css.out)
+          out := css.out
+          Fass.compile(f.in, out)
+          out.sync.close
         }
         catch (Err err)
         {

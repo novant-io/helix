@@ -49,6 +49,12 @@ abstract class HelixController
     res.sendErr(code)
   }
 
+  ** Send a raw file response.
+  virtual Void sendFile(File file)
+  {
+    FileWeblet(file).onGet
+  }
+
   ** Renderer instance for the current web request.
   HelixRenderer renderer { private set }
 

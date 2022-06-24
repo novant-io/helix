@@ -112,7 +112,7 @@ const class Route
   ** Match this route against the request arguments.  If route can
   ** be be matched, return the pattern arguments, or return 'null'
   ** for no match.
-  [Str:Str]? match(Uri uri, Str method)
+  virtual [Str:Str]? match(Uri uri, Str method)
   {
     // if methods not equal, no match
     if (method.compareIgnoreCase(this.method) != 0) return null
@@ -162,6 +162,54 @@ const class Route
 
   ** Parsed tokens.
   private const RouteToken[] tokens
+}
+
+*************************************************************************
+** ResRoute
+*************************************************************************
+
+**
+** ResRoute is a `Route` subclass used for servicing file resources.
+** Example:
+**
+**   ResRoute("/css/*", ["helixTest:/css/"])
+**
+const class ResRoute : Route
+{
+  ** Create a new resource route for given pattern to match source locations.
+  new make(Str pattern, Str[] dirs) : super(pattern, "GET", ResController#get)
+  {
+    dirs.each |d|
+    {
+      if (!d.endsWith("/")) throw ArgErr("Directory must end with '/'")
+      map  := Uri:File[:]
+      path := d.split('/')
+      if (path.size < 2) throw ArgErr("Invalid dir '${d}'")
+      base := "/" + path[1..-1].join("/")
+      pod  := Pod.find(path.first)
+      pod.files.each |f|
+      {
+        if (f.isDir) return
+        if (f.pathStr.startsWith(base)) map[`${base}${f.name}`] = f
+      }
+      this.allow = map
+    }
+  }
+
+  override [Str:Str]? match(Uri uri, Str method)
+  {
+    // delegate to super to check if we are a match
+    m := super.match(uri, method)
+    if (m == null) return null
+
+    // if matched, check allowlist map or mark unmatched
+    return allow[uri] != null ? m : null
+  }
+
+  ** Resolve uri to file or 'null' if not found.
+  internal File? resolve(Uri uri) { allow[uri] }
+
+  private const Uri:File allow := [:]
 }
 
 **************************************************************************
