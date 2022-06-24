@@ -50,6 +50,10 @@ const class Route
   ** method on a subclass of `HelixController`.
   const Method handler
 
+  ** Callback for route to process request before target
+  ** controller services request.
+  virtual Void onBeforeService(Str:Str args) {}
+
   ** Match this route against the request arguments.  If route can
   ** be be matched, return the pattern arguments, or return 'null'
   ** for no match.
@@ -86,11 +90,8 @@ const class Route
   ** 'toStr' is `pattern`.
   override Str toStr() { pattern }
 
-  ** Is the route all literal tokens (no args or patterns)?
-  internal const Bool isLiteral
-
-  ** Parsed tokens.
-  private const RouteToken[] tokens
+  internal const Bool isLiteral        // are all tokens == literals
+  internal const RouteToken[] tokens   // parse tokens
 }
 
 *************************************************************************

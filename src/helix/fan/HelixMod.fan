@@ -51,6 +51,7 @@ abstract const class HelixMod : WebMod
 
       // allow pre-service
       onBeforeService(match.args)
+      match.route.onBeforeService(match.args)
       if (res.isDone) return
 
       // delegate to Route.handler/HelixController
