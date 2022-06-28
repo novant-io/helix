@@ -42,6 +42,7 @@ abstract const class HelixMod : WebMod
     try
     {
       // set mod
+      st := Duration.now
       req.mod = this
 
       // match req to Route
@@ -62,6 +63,8 @@ abstract const class HelixMod : WebMod
 
       // allow post-service
       onAfterService(match.args)
+      et := Duration.now
+      trace(req, et-st)
     }
     catch (HelixErr err)
     {
@@ -105,6 +108,12 @@ abstract const class HelixMod : WebMod
 //////////////////////////////////////////////////////////////////////////
 // Logging
 //////////////////////////////////////////////////////////////////////////
+
+  // TODO: not sure how this works yets
+  private Void trace(WebReq req, Duration time)
+  {
+    log.trace("> ${req.method} \"${req.uri}\" ${DateTime.now.toLocale} (completed in ${time.toLocale})")
+  }
 
   // TODO: not sure how this works yet
   internal const HelixLog log
