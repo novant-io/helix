@@ -61,8 +61,12 @@ internal class CompileFass : Task
         }
         catch (Err err)
         {
+          // move line position next to file
           failed = true
-          echo("${f.osPath}: ${err.msg}")
+          off := err.msg.index("[line:")
+          msg := err.msg[0..<off]
+          pos := err.msg[off+6..-2]
+          echo("${f.osPath}(${pos}): ${msg}")
         }
       }
 
