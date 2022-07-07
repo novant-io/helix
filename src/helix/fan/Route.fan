@@ -111,19 +111,19 @@ const class Route
 **
 ** Example:
 **
-**   ResRoute("/js/foo.js",  [Pod.find("mypod").file(`/res/js/foo.js/`)])
-**   ResRoute("/css/{file}", [typeof.pod.file(`/css/`)])
+**   ResRoute("/js/foo.js",  [`fan://mypod/res/js/foo.js`])
+**   ResRoute("/css/{file}", [`fan://mypod/css/`])
 **
 const class ResRoute : Route
 {
   ** Constructor.
-  new make(Str pattern, File[] sources) : super(pattern, "GET", ResController#get)
+  new make(Str pattern, Uri[] sources) : super(pattern, "GET", ResController#get)
   {
     map := Str:File[:]
     sources.each |src|
     {
       if (src.isDir) listDir(src).each |f| { map.add(f.name, f) }
-      else map.add(src.name, src)
+      else map.add(src.name, src.toFile)
     }
     this.sources = map
   }
@@ -132,19 +132,19 @@ const class ResRoute : Route
   internal File? resolve(Uri uri) { sources[uri.name] }
 
   ** List files under given directory instance.
-  private File[] listDir(File dir)
+  private File[] listDir(Uri dir)
   {
-    switch (dir.uri.scheme)
+    switch (dir.scheme)
     {
-      case "file": return dir.listFiles
+      case "file": return dir.toFile.listFiles
       case "fan":
         // Pod.file does not allow us to iterate dirs so we need
         // to get manually match files using path prefix
-        prefix := dir.uri.relToAuth.pathStr
-        pod    := Pod.find(dir.uri.host)
+        prefix := dir.relToAuth.pathStr
+        pod    := Pod.find(dir.host)
         return pod.files.findAll |f| { !f.isDir && f.uri.pathStr.startsWith(prefix) }
 
-      default: throw ArgErr("Unsupported scheme '$dir.uri.scheme'")
+      default: throw ArgErr("Unsupported scheme '$dir.scheme'")
     }
   }
 
