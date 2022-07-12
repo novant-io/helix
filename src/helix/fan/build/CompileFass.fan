@@ -52,11 +52,13 @@ internal class CompileFass : Task
       {
         try
         {
-          // TODO: this could be better
-          // compile first to validate
           css := outFass + `${f.basename}.css`
           out := css.out
-          Fass.compile(f.in, out)
+          Fass.compile(f.in, out) |use|
+          {
+            u := files[use] ?: throw Err("File not found '${use}'")
+            return u.in
+          }
           out.sync.close
         }
         catch (Err err)
@@ -64,8 +66,8 @@ internal class CompileFass : Task
           // move line position next to file
           failed = true
           off := err.msg.index("[line:")
-          msg := err.msg[0..<off]
-          pos := err.msg[off+6..-2]
+          msg := off==null ? err.msg : err.msg[0..<off]
+          pos := off==null ? "?"     : err.msg[off+6..-2]
           echo("${f.osPath}(${pos}): ${msg}")
         }
       }
