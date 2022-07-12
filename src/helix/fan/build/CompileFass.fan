@@ -50,6 +50,10 @@ internal class CompileFass : Task
       failed := false
       files.each |f|
       {
+        // TODO: flag files that were not imported anywhere and not used?
+        // skip files designated as import-only
+        if (f.name.startsWith("_")) return
+
         try
         {
           css := outFass + `${f.basename}.css`
