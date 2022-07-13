@@ -117,7 +117,7 @@ const class Route
 const class ResRoute : Route
 {
   ** Constructor.
-  new make(Str pattern, Uri[] sources) : super(pattern, "GET", ResController#get)
+  new make(Str pattern, Uri[] sources) : super(pattern, "GET", ResController#getRes)
   {
     map := Str:File[:]
     sources.each |src|
@@ -149,4 +149,27 @@ const class ResRoute : Route
   }
 
   private const Str:File sources := [:]
+}
+
+*************************************************************************
+** ResRoute
+*************************************************************************
+
+**
+** PackRoute is a `Route` subclass used for servicing
+** `FilePack`[web::FilePack]file resources.
+**
+** Example:
+**
+**   PackRoute("/js/app.js", FilePack(FilePack.toAppJsFiles(pods))
+**
+const class PackRoute : Route
+{
+  ** Constructor.
+  new make(Str pattern, FilePack pack) : super(pattern, "GET", ResController#getPack)
+  {
+    this.pack = pack
+  }
+
+  internal const FilePack pack
 }
