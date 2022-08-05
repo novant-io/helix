@@ -62,7 +62,7 @@ class HelixRenderer
     res.statusCode = this.statusCode
     res.headers["Content-Type"] = "application/json; charset=utf-8"
     out := setupGzip
-    JsonOutStream(out).writeJson(obj )
+    JsonOutStream(out).writeJson(obj)
     out.printLine.flush.close
   }
 
@@ -73,7 +73,7 @@ class HelixRenderer
     res.statusCode = this.statusCode
     res.headers["Content-Type"] = "text/html; charset=utf-8"
     out := setupGzip
-    Fanbars.compile(template).render(out, data)
+    Fanbars.compile(template).render(out, mergeData(data))
     out.flush.close
   }
 
@@ -86,7 +86,7 @@ class HelixRenderer
     res.statusCode = this.statusCode
     res.headers["Content-Type"] = "text/html; charset=utf-8"
     out := setupGzip
-    template(name).render(out, data) |Str p->Fanbars| { template(p) }
+    template(name).render(out, mergeData(data)) |Str p->Fanbars| { template(p) }
     out.flush.close
   }
 
@@ -96,6 +96,11 @@ class HelixRenderer
   //   // TODO err-{code}
   //   // fallback to generic err.fbs ?
   // }
+
+  private Str:Obj? mergeData(Str:Obj? data)
+  {
+    controller.baseData.dup.setAll(data)
+  }
 
   private Fanbars template(Str name)
   {
