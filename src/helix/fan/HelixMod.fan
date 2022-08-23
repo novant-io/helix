@@ -70,7 +70,10 @@ abstract const class HelixMod : WebMod
     {
       // TODO FIXIT
       log.trace("ERR: $req.uri", err)
-      res.sendErr(err.errCode)
+
+      // first check if this was a redirect
+      if (err.redirectUri != null) res.redirect(err.redirectUri, err.errCode)
+      else res.sendErr(err.errCode)
     }
     catch (Err err)
     {
