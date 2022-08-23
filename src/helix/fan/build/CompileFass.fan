@@ -58,21 +58,22 @@ internal class CompileFass : Task
         {
           css := outFass + `${f.basename}.css`
           out := css.out
-          Fass.compile(f.in, out) |use|
+          Fass.compile(f, f.in, out) |use|
           {
             u := files[use] ?: throw Err("File not found '${use}'")
             return u.in
           }
           out.sync.close
         }
+        catch (FassCompileErr ferr)
+        {
+          failed = true
+          echo("${ferr.loc}: ${ferr.msg}")
+        }
         catch (Err err)
         {
-          // move line position next to file
           failed = true
-          off := err.msg.index("[line:")
-          msg := off==null ? err.msg : err.msg[0..<off]
-          pos := off==null ? "?"     : err.msg[off+6..-2]
-          echo("${f.osPath}(${pos}): ${msg}")
+          echo("${f.osPath}: ${err.msg}")
         }
       }
 
