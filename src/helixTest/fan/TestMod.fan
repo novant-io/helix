@@ -6,6 +6,7 @@
 //   20 Jun 2022  Andy Frank  Creation
 //
 
+using concurrent
 using helix
 using web
 
@@ -31,6 +32,14 @@ const class TestMod : HelixMod
         // inline
         Route("/inline/a", "GET", TestController#inlineA),
         Route("/inline/b", "GET", TestController#inlineB),
+
+        // args
+        Route("/args/empty",             "GET",  TestController#argTest),
+        Route("/args/route/{foo}",       "GET",  TestController#argTest),
+        Route("/args/route/{foo}/{bar}", "GET",  TestController#argTest),
+        Route("/args/form",              "POST", TestController#argTest),
+        Route("/args/form/{foo}",        "POST", TestController#argTest),
+        Route("/args/form/{foo}/{bar}",  "POST", TestController#argTest),
 
         // templates
         Route("/",        "GET", TestController#index),
@@ -63,6 +72,14 @@ class TestController : HelixController
   // inline
   Void inlineA() { renderer.renderInline("inline-literal", [:]) }
   Void inlineB() { renderer.renderInline("inline-simple [{{foo}}]", ["foo":"abc-543"]) }
+
+  // args
+  static const AtomicRef argsRef := AtomicRef(null)
+  Void argTest()
+  {
+    TestController.argsRef.val = this.args->map
+    renderer.renderText("ok")
+  }
 
   // templates
   Void index()   { renderer.renderTemplate("test_index", [:]) }

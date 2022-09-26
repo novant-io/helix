@@ -39,22 +39,42 @@ abstract class HelixTest : Test
   }
 
   ** Verify `sendGet` headers and content.
-  Void verifyGet(Uri uri, Str:Str headers, Str content)
+  Void verifyGet(Uri uri, Str:Str resHeaders, Str resContent)
   {
     // gzip enabled
     c := client(uri).writeReq.readRes
-    headers.each |v,n| { verifyEq(v, c.resHeaders[n]) }
+    resHeaders.each |v,n| { verifyEq(v, c.resHeaders[n]) }
     verifyEq(c.resHeaders["Content-Encoding"], "gzip")
-    verifyEq(content, c.resStr)
+    verifyEq(resContent, c.resStr)
 
     // gzip disabled
     c = client(uri)
     c.reqHeaders.remove("Accept-Encoding")
     c.writeReq.readRes
-    headers.each |v,n| { verifyEq(v, c.resHeaders[n]) }
+    resHeaders.each |v,n| { verifyEq(v, c.resHeaders[n]) }
     verifyEq(c.resCode, 200)
     verifyEq(c.resHeaders["Content-Encoding"], null)
-    verifyEq(content, c.resStr)
+    verifyEq(resContent, c.resStr)
+  }
+
+  ** Verify `sendPost` headers and content.
+  Void verifyPost(Uri uri, Str:Str form, Str:Str resHeaders, Str resContent)
+  {
+    // gzip enabled
+    c := client(uri)
+    c.postForm(form)
+    resHeaders.each |v,n| { verifyEq(v, c.resHeaders[n]) }
+    verifyEq(c.resHeaders["Content-Encoding"], "gzip")
+    verifyEq(resContent, c.resStr)
+
+    // gzip disabled
+    c = client(uri)
+    c.reqHeaders.remove("Accept-Encoding")
+    c.postForm(form)
+    resHeaders.each |v,n| { verifyEq(v, c.resHeaders[n]) }
+    verifyEq(c.resCode, 200)
+    verifyEq(c.resHeaders["Content-Encoding"], null)
+    verifyEq(resContent, c.resStr)
   }
 
   ** Verify a 404 response.
@@ -63,6 +83,23 @@ abstract class HelixTest : Test
     c := client(uri).writeReq.readRes
     // echo(c.resStr)
     verifyEq(c.resCode, 404)
+  }
+
+  ** Verify a GET 500 response.
+  Void verifyGet500(Uri uri)
+  {
+    c := client(uri).writeReq.readRes
+    // echo(c.resStr)
+    verifyEq(c.resCode, 500)
+  }
+
+  ** Verify a POST 500 response.
+  Void verifyPost500(Uri uri, Str:Str form)
+  {
+    c := client(uri)
+    c.postForm(form)
+    // echo(c.resStr)
+    verifyEq(c.resCode, 500)
   }
 
   private WispService? wisp

@@ -57,9 +57,9 @@ abstract const class HelixMod : WebMod
 
       // delegate to Route.handler/HelixController
       h := match.route.handler
-      args := h.params.isEmpty ? null : [match.args]
       c := h.parent == typeof ? this : h.parent.make
-      c.trap(h.name, args)
+      c.typeof.field("args").set(c, HelixArgs(req, match.args))
+      c.trap(h.name)
 
       // allow post-service
       onAfterService(match.args)

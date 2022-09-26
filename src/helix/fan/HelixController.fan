@@ -17,12 +17,13 @@ abstract class HelixController
   ** Constructor.
   new make()
   {
-    this.req = Actor.locals["web.req"]
-    this.res = Actor.locals["web.res"]
+    this.req  = Actor.locals["web.req"]
+    this.res  = Actor.locals["web.res"]
+    this.args = HelixArgs.defVal
     this.renderer = makeRenderer
   }
 
-  ** Parent `HelixMod` instance for the current web requests.
+  ** Parent `HelixMod` instance for the current web request.
   HelixMod mod() { req.mod }
 
   ** WebReq instance for the current web request.
@@ -33,6 +34,9 @@ abstract class HelixController
 
   ** Base data common to all controller endpoints.
   Str:Obj? baseData := [:]
+
+  ** Arguments for the currrent web request.
+  HelixArgs args { internal set }
 
   ** Send a temporary redirect response.
   virtual Void sendTempRedirect(Uri uri)
