@@ -6,6 +6,7 @@
 //   26 Sep 2022  Andy Frank  Creation
 //
 
+using concurrent
 using web
 
 **
@@ -24,14 +25,59 @@ const class HelixArgs
   **
   internal static new makeReq(WebReq req, Str:Str routeArgs)
   {
-    map := Str:Str[:].addAll(routeArgs)
+    map := Str:Obj[:]
+    map.addAll(routeArgs)
     map.addAll(req.uri.query)
     if (req.form != null) map.addAll(req.form)
+    if (req.headers["Content-Type"]?.contains("multipart/form-data") == true)
+    {
+      req.parseMultiPartForm |k,in,h| {
+        map.add(k, parsePart(h, in))
+      }
+    }
     return HelixArgs(map)
   }
 
+  private static const Regex r := Regex(Str<|filename="(.*?)"|>)
+  private static Obj parsePart(Str:Str headers, InStream in)
+  {
+    d := headers["Content-Disposition"]
+    m := r.matcher(d)
+
+    // short-circuit as str if no filename field
+    if (!m.find) return in.readAllStr
+
+    // File.createTemp requires dir to exist first
+    if (!Env.cur.tempDir.exists) Env.cur.tempDir.create
+
+    // dump contents into temp file
+    f := m.group(1)
+    x := f[f.indexr(".")..-1]
+    t := File.createTemp("helix-", x, Env.cur.tempDir)
+    return t
+  }
+
   ** Private ctor.
-  private new make(Str:Str map) { this.map = map }
+  private new make(Str:Obj map) { this.map = map }
+
+  ** Cleanup after request has been serviced.
+  internal Void cleanup()
+  {
+    // delete any temp files not moved
+    map.each |v| {
+      if (v is File) ((File)v).delete
+    }
+  }
+
+  private Obj req(Str name)
+  {
+    v := map[name]
+    if (v == null) throw ArgErr("missing required argument '$name'")
+    return v
+  }
+
+  ** Get a required arg as 'Str' or throw error.
+  Str reqStr(Str name) { req(name).toStr }
 
   ** Get a required arg as 'Int' or throw error.
   Int reqInt(Str name)
@@ -41,16 +87,16 @@ const class HelixArgs
     return i
   }
 
-  ** Get a required arg as 'Str' or throw error.
-  Str reqStr(Str name)
+  ** Get a required file arg as 'InStream' or throw error.
+  File reqFile(Str name)
   {
-    v := map[name]
-    if (v == null) throw ArgErr("missing required argument '$name'")
+    v := req(name)
+    if (v isnot File) throw ArgErr("invalid value '${v}'")
     return v
   }
 
   ** Get an optional arg as 'Str' or 'null' if not found.
-  Str? optStr(Str name) { map[name] }
+  Str? optStr(Str name) { map[name]?.toStr }
 
   ** Get an optional arg as 'Int' or 'null' if not found.
   ** Throws 'ArgErr' if value exists but invalid.
@@ -61,9 +107,19 @@ const class HelixArgs
     return v.toInt(10, false) ?: throw ArgErr("invalid value '${v}'")
   }
 
+  ** Get an optional file arg as 'InStream' or 'null' if not found.
+  ** Throws 'ArgErr' if value exists but invalid.
+  File? optFile(Str name)
+  {
+    v :=  map[name]
+    if (v == null) return null
+    if (v isnot File) throw ArgErr("invalid value '${v}'")
+    return v
+  }
+
   override Str toStr() { map.toStr }
 
   internal static const HelixArgs defVal := HelixArgs([:])
 
-  private const Str:Str map
+  private const Str:Obj map
 }

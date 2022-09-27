@@ -52,7 +52,7 @@ const class Route
 
   ** Callback for route to process request before target
   ** controller services request.
-  virtual Void onBeforeService(Str:Str args) {}
+  virtual Void onBeforeService(HelixArgs args) {}
 
   ** Match this route against the request arguments.  If route can
   ** be be matched, return the pattern arguments, or return 'null'

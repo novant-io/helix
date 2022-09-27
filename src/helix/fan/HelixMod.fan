@@ -31,10 +31,10 @@ abstract const class HelixMod : WebMod
   const Router router
 
   ** Invoked prior to servicing the current request.
-  virtual Void onBeforeService(Str:Str args) {}
+  virtual Void onBeforeService(HelixArgs args) {}
 
   ** Invoked after servicing the current request.
-  virtual Void onAfterService(Str:Str args) {}
+  virtual Void onAfterService(HelixArgs args) {}
 
   ** Service incoming request.
   override Void onService()
@@ -50,19 +50,25 @@ abstract const class HelixMod : WebMod
       if (match == null) throw HelixErr(404)
       req.stash["helix.route"] = match.route
 
+      // create args
+      args := HelixArgs(req, match.args)
+
       // allow pre-service
-      onBeforeService(match.args)
-      match.route.onBeforeService(match.args)
+      onBeforeService(args)
+      match.route.onBeforeService(args)
       if (res.isDone) return
 
       // delegate to Route.handler/HelixController
       h := match.route.handler
       c := h.parent == typeof ? this : h.parent.make
-      c.typeof.field("args").set(c, HelixArgs(req, match.args))
+      c.typeof.field("args").set(c, args)
       c.trap(h.name)
 
       // allow post-service
-      onAfterService(match.args)
+      onAfterService(args)
+
+      // cleanup
+      args.cleanup
       et := Duration.now
       trace(req, res, et-st)
     }
