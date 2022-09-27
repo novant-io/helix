@@ -54,6 +54,7 @@ const class HelixArgs
     f := m.group(1)
     x := f[f.indexr(".")..-1]
     t := File.createTemp("helix-", x, Env.cur.tempDir)
+    o := t.out; in.pipe(o); o.sync.close
     return t
   }
 
