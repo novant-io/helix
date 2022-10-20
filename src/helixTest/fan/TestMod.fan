@@ -46,6 +46,11 @@ const class TestMod : HelixMod
         Route("/simple",  "GET", TestController#simple),
         Route("/partial", "GET", TestController#partial),
 
+        // files
+        Route("/file/a.foo", "GET", TestController#fileA),
+        Route("/file/b.bar", "GET", TestController#fileB),
+        Route("/file/c.csv", "GET", TestController#fileC),
+
         // resources
         ResRoute("/css/{file}",        [`fan://helixTest/css/`]),
         ResRoute("/foo/bar/alpha.css", [`fan://helixTest/css/alpha.css`]),
@@ -68,6 +73,23 @@ class TestController : HelixController
   Void jsonStr()  { renderer.renderJson("json-str") }
   Void jsonNum()  { renderer.renderJson(45) }
   Void jsonBool() { renderer.renderJson(true) }
+
+  // file
+  Void fileA() {
+    renderer.renderFile("text/foo") |out| {
+      out.printLine("This is a file")
+    }
+  }
+  Void fileB() {
+    renderer.renderFile("text/bar") |out| {
+      out.printLine("This is another file")
+    }
+  }
+  Void fileC() {
+    renderer.renderFileDownload("text/csv", "some.csv") |out| {
+      out.printLine("foo,bar,zar")
+    }
+  }
 
   // inline
   Void inlineA() { renderer.renderInline("inline-literal", [:]) }

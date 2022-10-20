@@ -58,6 +58,23 @@ class RenderTest : HelixTest
   }
 
 //////////////////////////////////////////////////////////////////////////
+// File
+//////////////////////////////////////////////////////////////////////////
+
+  Void testRenderFile()
+  {
+    // file
+    ha := ["Content-Type":"text/foo"]
+    hb := ["Content-Type":"text/bar"]
+    verifyGet(`/file/a.foo`, ha, "This is a file\n")
+    verifyGet(`/file/b.bar`, hb, "This is another file\n")
+
+    // download
+    hc := ["Content-Type":"text/csv", "Content-Disposition":"attachment; filename=\"some.csv\""]
+    verifyGet(`/file/c.csv`, hc, "foo,bar,zar\n")
+  }
+
+//////////////////////////////////////////////////////////////////////////
 // Templates
 //////////////////////////////////////////////////////////////////////////
 

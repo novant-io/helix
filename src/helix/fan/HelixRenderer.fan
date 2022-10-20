@@ -66,6 +66,33 @@ class HelixRenderer
     out.printLine.flush.close
   }
 
+  ** Render raw file content output to the browser using the given MIME
+  ** type.  This method will flush and close the 'OutStream' after
+  ** callback function is invoked. See `renderFileDownload` to trigger
+  ** browser to download content instead of displaying.
+  virtual Void renderFile(Str mimeType, |OutStream| f)
+  {
+    res.statusCode = this.statusCode
+    res.headers["Content-Type"] = mimeType
+    out := setupGzip
+    f(out)
+    out.flush.close
+  }
+
+  ** Render raw file content using the 'Content-Disposition' header
+  ** to trigger browser to download instead of displaying.  This method
+  ** will flush and close the 'OutStream' after callback function is
+  ** invoked. See `renderFile` to render file content into browser.
+  virtual Void renderFileDownload(Str mimeType, Str filename, |OutStream| f)
+  {
+    res.statusCode = this.statusCode
+    res.headers["Content-Disposition"] = "attachment; filename=\"${filename}\""
+    res.headers["Content-Type"] = mimeType
+    out := setupGzip
+    f(out)
+    out.flush.close
+  }
+
   ** Render given inline template and data to 'res.out' using
   ** content type '"text/html; charset=utf-8"'.
   virtual Void renderInline(Str template, Str:Obj? data := [:])
