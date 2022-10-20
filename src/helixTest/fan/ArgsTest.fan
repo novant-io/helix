@@ -71,19 +71,19 @@ class ArgsTest : HelixTest
 // Support
 //////////////////////////////////////////////////////////////////////////
 
-  private Void verifyGetArgs(Uri uri, Str:Str expected)
+  private Void verifyGetArgs(Uri uri, Str:Obj expected)
   {
     verifyGet(uri, [:], "ok")
     // echo("---> " + TestController.argsRef.val)
-    Str:Str temp := Str:Str[:].addAll(expected)  // stupid type inference
+    Str:Obj temp := Str:Obj[:].addAll(expected)  // stupid type inference
     verifyEq(TestController.argsRef.val, temp)
   }
 
-  private Void verifyPostArgs(Uri uri, Str:Str form, Str:Str expected)
+  private Void verifyPostArgs(Uri uri, Str:Str form, Str:Obj expected)
   {
     verifyPost(uri, form, [:], "ok")
     // echo("---> " + TestController.argsRef.val)
-    Str:Str temp := Str:Str[:].addAll(expected)  // stupid type inference
+    Str:Obj temp := Str:Obj[:].addAll(expected)  // stupid type inference
     verifyEq(TestController.argsRef.val, temp)
   }
 }
