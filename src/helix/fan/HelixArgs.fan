@@ -88,6 +88,18 @@ const class HelixArgs
     return i
   }
 
+  ** Get a required arg as 'Int[]' or throw error.
+  Int[] reqIntList(Str name)
+  {
+    v := reqStr(name)
+    try
+    {
+      Int[] i := v.split(',').map |s| { s.toInt }
+      return i
+    }
+    catch (Err err) throw ArgErr("invalid value '${v}'", err)
+  }
+
   ** Get a required file arg as 'InStream' or throw error.
   File reqFile(Str name)
   {
