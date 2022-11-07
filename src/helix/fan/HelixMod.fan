@@ -31,10 +31,10 @@ abstract const class HelixMod : WebMod
   const Router router
 
   ** Invoked prior to servicing the current request.
-  virtual Void onBeforeService(HelixArgs args) {}
+  virtual Void onBeforeService(Route route, HelixArgs args) {}
 
   ** Invoked after servicing the current request.
-  virtual Void onAfterService(HelixArgs args) {}
+  virtual Void onAfterService(Route route, HelixArgs args) {}
 
   ** Service incoming request.
   override Void onService()
@@ -54,7 +54,7 @@ abstract const class HelixMod : WebMod
       args := HelixArgs(req, match.args)
 
       // allow pre-service
-      onBeforeService(args)
+      onBeforeService(match.route, args)
       match.route.onBeforeService(args)
       if (res.isDone) return
 
@@ -65,7 +65,7 @@ abstract const class HelixMod : WebMod
       c.trap(h.name)
 
       // allow post-service
-      onAfterService(args)
+      onAfterService(match.route, args)
 
       // cleanup
       args.cleanup
