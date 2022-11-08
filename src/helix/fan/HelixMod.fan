@@ -72,21 +72,27 @@ abstract const class HelixMod : WebMod
       et := Duration.now
       trace(req, res, et-st)
     }
-    catch (HelixErr err)
+    catch (Err origErr)
     {
       // TODO FIXIT
-      log.trace("ERR: $req.uri", err)
+      log.trace("ERR: $req.uri", origErr)
+
+      // wrap err if not already HelixErr
+      err := origErr as HelixErr
+      if (err == null) err = HelixErr(500, origErr)
 
       // first check if this was a redirect
-      if (err.redirectUri != null) res.redirect(err.redirectUri, err.errCode)
-      else res.sendErr(err.errCode)
+      if (err.redirectUri != null) return res.redirect(err.redirectUri, err.errCode)
+
+      // else err callback
+      onServiceErr(err)
     }
-    catch (Err err)
-    {
-      // TODO FIXIT
-      log.trace("ERR: $req.uri", err)
-      res.sendErr(500)
-    }
+  }
+
+  ** Callback when an error occured during `onService`.
+  virtual Void onServiceErr(HelixErr err)
+  {
+    res.sendErr(err.errCode)
   }
 
 //////////////////////////////////////////////////////////////////////////
