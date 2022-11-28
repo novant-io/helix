@@ -100,6 +100,14 @@ const class HelixArgs
     catch (Err err) throw ArgErr("invalid value '${v}'", err)
   }
 
+  ** Get a required arg as 'Date' or throw error.
+  Date reqDate(Str name)
+  {
+    v := reqStr(name)
+    d := Date.fromStr(v, false) ?: throw ArgErr("invalid valud '${v}'")
+    return d
+  }
+
   ** Get a required file arg as 'InStream' or throw error.
   File reqFile(Str name)
   {
@@ -118,6 +126,14 @@ const class HelixArgs
     v := optStr(name)
     if (v == null) return null
     return v.toInt(10, false) ?: throw ArgErr("invalid value '${v}'")
+  }
+
+  ** Get an optional arg as 'Date' or 'null' if not found;
+  Date? optDate(Str name)
+  {
+    v := optStr(name)
+    if (v == null) return null
+    return Date.fromStr(v, false) ?: throw ArgErr("invalid valud '${v}'")
   }
 
   ** Get an optional file arg as 'InStream' or 'null' if not found.
