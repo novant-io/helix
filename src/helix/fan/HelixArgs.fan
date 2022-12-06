@@ -80,6 +80,9 @@ const class HelixArgs
   ** Get a required arg as 'Str' or throw error.
   Str reqStr(Str name) { req(name).toStr }
 
+  ** Get a required arg as 'Str[]' or throw error.
+  Str[] reqStrList(Str name) { reqStr(name).split(',') }
+
   ** Get a required arg as 'Int' or throw error.
   Int reqInt(Str name)
   {
@@ -118,6 +121,13 @@ const class HelixArgs
 
   ** Get an optional arg as 'Str' or 'null' if not found.
   Str? optStr(Str name) { map[name]?.toStr }
+
+  ** Get an optional arg as 'Str[]' or 'null' if not found.
+  Str[]? optStrList(Str name)
+  {
+    v := optStr(name)
+    return v == null ? null : v.split(',')
+  }
 
   ** Get an optional arg as 'Int' or 'null' if not found.
   ** Throws 'ArgErr' if value exists but invalid.
