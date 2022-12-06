@@ -81,7 +81,11 @@ const class HelixArgs
   Str reqStr(Str name) { req(name).toStr }
 
   ** Get a required arg as 'Str[]' or throw error.
-  Str[] reqStrList(Str name) { reqStr(name).split(',') }
+  Str[] reqStrList(Str name)
+  {
+    v := reqStr(name).trim
+    return v.isEmpty ? Str#.emptyList : v.split(',')
+  }
 
   ** Get a required arg as 'Int' or throw error.
   Int reqInt(Str name)
@@ -125,8 +129,10 @@ const class HelixArgs
   ** Get an optional arg as 'Str[]' or 'null' if not found.
   Str[]? optStrList(Str name)
   {
-    v := optStr(name)
-    return v == null ? null : v.split(',')
+    v := optStr(name)?.trim
+    if (v == null) return null
+    if (v.isEmpty) return Str#.emptyList
+    return v.split(',')
   }
 
   ** Get an optional arg as 'Int' or 'null' if not found.
