@@ -107,6 +107,15 @@ const class HelixArgs
     catch (Err err) throw ArgErr("invalid value '${v}'", err)
   }
 
+  ** Get a required arg as 'Bool' or throw error.
+  Bool reqBool(Str name)
+  {
+    v := reqStr(name)
+    b := Bool.fromStr(v, false)
+    if (b == null) throw ArgErr("invalid value '${v}'")
+    return b
+  }
+
   ** Get a required arg as 'Date' or throw error.
   Date reqDate(Str name)
   {
@@ -142,6 +151,15 @@ const class HelixArgs
     v := optStr(name)
     if (v == null) return null
     return v.toInt(10, false) ?: throw ArgErr("invalid value '${v}'")
+  }
+
+  ** Get an optional arg as 'Bool' or 'null' if not error.
+  ** Throws 'ArgErr' if value exists but invalid.
+  Bool? optBool(Str name)
+  {
+    v := optStr(name)
+    if (v == null) return null
+    return Bool.fromStr(v, false) ?: throw ArgErr("invalid value '${v}'")
   }
 
   ** Get an optional arg as 'Date' or 'null' if not found;
