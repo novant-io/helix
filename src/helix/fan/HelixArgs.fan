@@ -80,6 +80,14 @@ const class HelixArgs
   ** Get a required arg as 'Str' or throw error.
   Str reqStr(Str name) { req(name).toStr }
 
+  ** Get a required arg as 'Str' where size > 1 or throw error.
+  Str reqStrNotEmpty(Str name)
+  {
+    v := req(name).toStr
+    if (v.isEmpty) throw ArgErr("argument cannot be empty '${name}'")
+    return v
+  }
+
   ** Get a required arg as 'Str[]' or throw error.
   Str[] reqStrList(Str name)
   {
@@ -148,26 +156,26 @@ const class HelixArgs
   ** Throws 'ArgErr' if value exists but invalid.
   Int? optInt(Str name)
   {
-    v := optStr(name)
+    v := optStr(name)?.trimToNull
     if (v == null) return null
-    return v.toInt(10, false) ?: throw ArgErr("invalid value '${v}'")
+    return v.toInt(10, false) ?: throw ArgErr("invalid int value '${v}'")
   }
 
   ** Get an optional arg as 'Bool' or 'null' if not error.
   ** Throws 'ArgErr' if value exists but invalid.
   Bool? optBool(Str name)
   {
-    v := optStr(name)
+    v := optStr(name)?.trimToNull
     if (v == null) return null
-    return Bool.fromStr(v, false) ?: throw ArgErr("invalid value '${v}'")
+    return Bool.fromStr(v, false) ?: throw ArgErr("invalid bool value '${v}'")
   }
 
   ** Get an optional arg as 'Date' or 'null' if not found;
   Date? optDate(Str name)
   {
-    v := optStr(name)
+    v := optStr(name)?.trimToNull
     if (v == null) return null
-    return Date.fromStr(v, false) ?: throw ArgErr("invalid valud '${v}'")
+    return Date.fromStr(v, false) ?: throw ArgErr("invalid date value '${v}'")
   }
 
   ** Get an optional file arg as 'InStream' or 'null' if not found.
@@ -176,7 +184,7 @@ const class HelixArgs
   {
     v :=  map[name]
     if (v == null) return null
-    if (v isnot File) throw ArgErr("invalid value '${v}'")
+    if (v isnot File) throw ArgErr("invalid file value '${v}'")
     return v
   }
 
