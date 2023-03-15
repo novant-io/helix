@@ -188,6 +188,12 @@ const class HelixArgs
     return v
   }
 
+  ** Iterate each argument in instnace.
+  Void each(|Str val, Str name| f)
+  {
+    map.each(f)
+  }
+
   override Str toStr() { map.toStr }
 
   internal static const HelixArgs defVal := HelixArgs([:])
