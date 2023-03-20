@@ -170,7 +170,7 @@ const class HelixArgs
     return Bool.fromStr(v, false) ?: throw ArgErr("invalid bool value '${v}'")
   }
 
-  ** Get an optional arg as 'Date' or 'null' if not found;
+  ** Get an optional arg as 'Date' or 'null' if not found.
   Date? optDate(Str name, Str format := "YYYY-MM-DD")
   {
     v := optStr(name)?.trimToNull

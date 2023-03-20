@@ -49,6 +49,7 @@ class ArgsTest : HelixTest
       "int-list": "1,2,3,4",
       "date-a":   "2023-03-15",
       "date-b":   "3/15/23",
+      "date-c":   "",
     ]
 
     postForm(form) |args| {
@@ -58,6 +59,7 @@ class ArgsTest : HelixTest
       verifyEq(args.reqIntList("int-list"),      Obj?[1,2,3,4]) // TODO FIXIT
       verifyEq(args.reqDate("date-a"),           Date("2023-03-15"))
       verifyEq(args.reqDate("date-b", "M/D/YY"), Date("2023-03-15"))
+      verifyEq(args.optDate("date-c"),           null)
     }
   }
 
