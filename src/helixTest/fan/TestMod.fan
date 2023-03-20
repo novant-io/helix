@@ -96,10 +96,12 @@ class TestController : HelixController
   Void inlineB() { renderer.renderInline("inline-simple [{{foo}}]", ["foo":"abc-543"]) }
 
   // args
-  static const AtomicRef argsRef := AtomicRef(null)
+  static const AtomicRef argsRef    := AtomicRef(null)
+  static const AtomicRef argsMapRef := AtomicRef(null)
   Void argTest()
   {
-    TestController.argsRef.val = this.args->map
+    TestController.argsRef.val    = this.args
+    TestController.argsMapRef.val = this.args->map
     renderer.renderText("ok")
   }
 

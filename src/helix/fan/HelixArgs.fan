@@ -125,10 +125,10 @@ const class HelixArgs
   }
 
   ** Get a required arg as 'Date' or throw error.
-  Date reqDate(Str name)
+  Date reqDate(Str name, Str format := "YYYY-MM-DD")
   {
     v := reqStr(name)
-    d := Date.fromStr(v, false) ?: throw ArgErr("invalid valud '${v}'")
+    d := Date.fromLocale(v, format, false) ?: throw ArgErr("invalid valud '${v}'")
     return d
   }
 
@@ -171,11 +171,11 @@ const class HelixArgs
   }
 
   ** Get an optional arg as 'Date' or 'null' if not found;
-  Date? optDate(Str name)
+  Date? optDate(Str name, Str format := "YYYY-MM-DD")
   {
     v := optStr(name)?.trimToNull
     if (v == null) return null
-    return Date.fromStr(v, false) ?: throw ArgErr("invalid date value '${v}'")
+    return Date.fromLocale(v, format, false) ?: throw ArgErr("invalid date value '${v}'")
   }
 
   ** Get an optional file arg as 'InStream' or 'null' if not found.

@@ -6,6 +6,8 @@
 //   26 Sep 2022  Andy Frank  Creation
 //
 
+using helix
+
 **
 ** Test code for HelixArgs.
 **
@@ -36,6 +38,27 @@ class ArgsTest : HelixTest
     verifyPostArgs(`/args/form`, [:], [:])
     verifyPostArgs(`/args/form`, ["name":"bob"], ["name":"bob"])
     verifyPostArgs(`/args/form`, ["name":"bob", "pass":"xyz"], ["name":"bob", "pass":"xyz"])
+  }
+
+  Void testTypes()
+  {
+    form := [
+      "str":      "Foo",
+      "bool":     "false",
+      "int":      "12",
+      "int-list": "1,2,3,4",
+      "date-a":   "2023-03-15",
+      "date-b":   "3/15/23",
+    ]
+
+    postForm(form) |args| {
+      verifyEq(args.reqStr("str"),               "Foo")
+      verifyEq(args.reqBool("bool"),             false)
+      verifyEq(args.reqInt("int"),               12)
+      verifyEq(args.reqIntList("int-list"),      Obj?[1,2,3,4]) // TODO FIXIT
+      verifyEq(args.reqDate("date-a"),           Date("2023-03-15"))
+      verifyEq(args.reqDate("date-b", "M/D/YY"), Date("2023-03-15"))
+    }
   }
 
 //////////////////////////////////////////////////////////////////////////
@@ -74,16 +97,22 @@ class ArgsTest : HelixTest
   private Void verifyGetArgs(Uri uri, Str:Obj expected)
   {
     verifyGet(uri, [:], "ok")
-    // echo("---> " + TestController.argsRef.val)
+    // echo("---> " + TestController.argsMapRef.val)
     Str:Obj temp := Str:Obj[:].addAll(expected)  // stupid type inference
-    verifyEq(TestController.argsRef.val, temp)
+    verifyEq(TestController.argsMapRef.val, temp)
   }
 
   private Void verifyPostArgs(Uri uri, Str:Str form, Str:Obj expected)
   {
     verifyPost(uri, form, [:], "ok")
-    // echo("---> " + TestController.argsRef.val)
+    // echo("---> " + TestController.argsMapRef.val)
     Str:Obj temp := Str:Obj[:].addAll(expected)  // stupid type inference
-    verifyEq(TestController.argsRef.val, temp)
+    verifyEq(TestController.argsMapRef.val, temp)
+  }
+
+  private Void postForm(Str:Str form, |HelixArgs args| f)
+  {
+    verifyPost(`/args/form`, form, [:], "ok")
+    f(TestController.argsRef.val)
   }
 }
