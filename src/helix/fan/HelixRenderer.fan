@@ -42,6 +42,10 @@ class HelixRenderer
   ** Status code for response.
   Int statusCode := 200
 
+  ** If 'true' response is always gzipped, regardless
+  ** of 'Accept-Encoding' fallback.
+  Bool forceGzip := false
+
 //////////////////////////////////////////////////////////////////////////
 // Render
 //////////////////////////////////////////////////////////////////////////
@@ -148,11 +152,20 @@ class HelixRenderer
   ** if gzip is available and enabled.
   OutStream setupGzip()
   {
-    // check if client supports gzip and file has text/* MIME type
-    // and if so send the file using gzip compression (we don't
-    // know content length in this case)
-    ae := req.headers["Accept-Encoding"] ?: ""
-    if (WebUtil.parseQVals(ae)["gzip"] > 0f)
+    // init check
+    gzip := forceGzip
+
+    if (!gzip)
+    {
+      // check if client supports gzip and file has text/* MIME type
+      // and if so send the file using gzip compression (we don't
+      // know content length in this case)
+      ae := req.headers["Accept-Encoding"] ?: ""
+      gzip = WebUtil.parseQVals(ae)["gzip"] > 0f
+    }
+
+    // if gzip set encoding and wrap stream
+    if (gzip)
     {
       res.headers["Content-Encoding"] = "gzip"
       return Zip.gzipOutStream(res.out)
