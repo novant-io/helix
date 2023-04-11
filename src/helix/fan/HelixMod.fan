@@ -6,6 +6,7 @@
 //   9 Jun 2022  Andy Frank  Creation
 //
 
+using concurrent
 using fanbars
 using web
 using webmod
@@ -50,8 +51,9 @@ abstract const class HelixMod : WebMod
       if (match == null) throw HelixErr(404)
       req.stash["helix.route"] = match.route
 
-      // create args
+      // create and cache args
       args := HelixArgs(req, match.args)
+      Actor.locals["helix.args"] = args
 
       // allow pre-service
       onBeforeService(match.route, args)
@@ -60,8 +62,7 @@ abstract const class HelixMod : WebMod
 
       // delegate to Route.handler/HelixController
       h := match.route.handler
-      c := h.parent == typeof ? this : h.parent.make
-      c.typeof.field("args").set(c, args)
+      c := h.parent.make
       c.trap(h.name)
 
       // allow post-service

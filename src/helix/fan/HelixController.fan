@@ -19,7 +19,7 @@ abstract class HelixController
   {
     this.req  = Actor.locals["web.req"]
     this.res  = Actor.locals["web.res"]
-    this.args = HelixArgs.defVal
+    this.args = Actor.locals["helix.args"]
     this.renderer = makeRenderer
   }
 
