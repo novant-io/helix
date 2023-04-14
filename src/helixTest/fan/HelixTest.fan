@@ -41,20 +41,41 @@ abstract class HelixTest : Test
   ** Verify `sendGet` headers and content.
   Void verifyGet(Uri uri, Str:Str resHeaders, Str resContent)
   {
-    // gzip enabled
-    c := client(uri).writeReq.readRes
-    resHeaders.each |v,n| { verifyEq(v, c.resHeaders[n]) }
-    verifyEq(c.resHeaders["Content-Encoding"], "gzip")
-    verifyEq(resContent, c.resStr)
+    // find gzip size of resContent
+    z := Buf()
+    Zip.gzipOutStream(z.out).print(resContent).close
 
+    //
+    // gzip enabled
+    //
+    c := client(uri).writeReq.readRes
+    // verify gzip + res headers (just the ones we want to check)
+    verifyEq(c.resCode, 200)
+    verifyEq(c.resHeaders["Content-Encoding"], "gzip")
+    resHeaders.each |v,n| { verifyEq(v, c.resHeaders[n]) }
+    // verify content round-tripped
+    verifyEq(resContent, c.resStr)
+    // verify HelixMod.resSize  (check after c.resStr so stream drains)
+    cl := c.resHeaders["Content-Length"]
+    if (cl != null) verifyEq(cl, "${mod.bytesWritten}")
+    verifyEq(z.size, mod.bytesWritten)
+
+    //
     // gzip disabled
+    //
     c = client(uri)
     c.reqHeaders.remove("Accept-Encoding")
     c.writeReq.readRes
-    resHeaders.each |v,n| { verifyEq(v, c.resHeaders[n]) }
+    // verify !gzip + res headers (just the ones we want to check)
     verifyEq(c.resCode, 200)
     verifyEq(c.resHeaders["Content-Encoding"], null)
+    resHeaders.each |v,n| { verifyEq(v, c.resHeaders[n]) }
+    // verify content round-tripped
     verifyEq(resContent, c.resStr)
+    // verify HelixMod.resSize (check after c.resStr so stream drains)
+    cl = c.resHeaders["Content-Length"]
+    if (cl != null) verifyEq(cl, "${mod.bytesWritten}")
+    verifyEq(resContent.size, mod.bytesWritten)
   }
 
   ** Verify `sendPost` headers and content.

@@ -31,6 +31,10 @@ abstract const class HelixMod : WebMod
   ** Router model.
   const Router router
 
+//////////////////////////////////////////////////////////////////////////
+// Service
+//////////////////////////////////////////////////////////////////////////
+
   ** Invoked prior to servicing the current request.
   virtual Void onBeforeService(Route route, HelixArgs args) {}
 
@@ -96,6 +100,29 @@ abstract const class HelixMod : WebMod
     res.sendErr(err.errCode)
   }
 
+  ** Wrap res.out with byte counter.
+  @NoDoc override WebOutStream? makeResOut(OutStream out)
+  {
+    tout := ByteCountOutStream(out)
+    req.stash["helix.out"] = tout
+    return super.makeResOut(tout)
+  }
+
+  **
+  ** Get the number of bytes written for the current response
+  ** content, which does _not_ include HTTP headers.  This
+  ** method must be called on the same actor servicing the
+  ** HTTP request.
+  **
+  // TODO FIXIT: where should this method live?
+  @NoDoc Int resSize(Bool checked := true)
+  {
+    // check if HelixWispHooks is installed
+    bout := req.stash["helix.out"] as ByteCountOutStream
+    if (bout == null) throw ArgErr("ByteCountOutStream not found")
+    return bout.bytesWritten
+  }
+
 //////////////////////////////////////////////////////////////////////////
 // Lifecycle
 //////////////////////////////////////////////////////////////////////////
@@ -129,8 +156,9 @@ abstract const class HelixMod : WebMod
   private Void trace(WebReq req, WebRes res, Duration time)
   {
     date := DateTime.now.toLocale("kk::mm::ss") // DD-MMM-YY")
-    len  := "x bytes"
-    log.trace("> [${date}] ${req.method} \"${req.uri}\" (${len}, ${time.toLocale})")
+    enc  := res.headers["Content-Encoding"] ?: "uncompressed"
+    len  := resSize.toLocale("B")
+    log.trace("> [${date}] ${req.method} \"${req.uri}\" (${enc}, ${len}, ${time.toLocale})")
   }
 
   // TODO: not sure how this works yet

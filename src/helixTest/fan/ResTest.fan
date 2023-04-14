@@ -21,7 +21,13 @@ class ResTest : HelixTest
 
   Void testBasics()
   {
-    h := ["Content-Type":"text/css; charset=utf-8"]
+    // NOTE: test different content types to cover tests of HelixMod.resSize
+
+    h := ["Content-Type":"text/plain; charset=utf-8"]
+    c := "plain-text-a"
+    verifyGet(`/text/a`, h, c)
+
+    h = ["Content-Type":"text/css; charset=utf-8"]
     verifyGet(`/css/alpha.css`, h, "body {\n  color: #f00;\n}\n")
     verifyGet(`/css/beta.css`,  h, "h1 {\n  font-size: 32pt;\n}\n")
     verify404(`/css/nope.css`)

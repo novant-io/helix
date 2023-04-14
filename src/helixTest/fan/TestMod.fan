@@ -57,6 +57,14 @@ const class TestMod : HelixMod
       ]
     }
   }
+
+  Int bytesWritten() { _bytesWritten.val }
+  private const AtomicInt _bytesWritten := AtomicInt(0)
+
+  override Void onAfterService(Route route, HelixArgs args)
+  {
+    _bytesWritten.val = this.resSize
+  }
 }
 
 *************************************************************************
