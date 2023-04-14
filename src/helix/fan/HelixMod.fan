@@ -117,10 +117,9 @@ abstract const class HelixMod : WebMod
   // TODO FIXIT: where should this method live?
   @NoDoc Int resSize(Bool checked := true)
   {
-    // check if HelixWispHooks is installed
+    // assume if bout == null then no content
     bout := req.stash["helix.out"] as ByteCountOutStream
-    if (bout == null) throw ArgErr("ByteCountOutStream not found")
-    return bout.bytesWritten
+    return bout == null ? 0 : bout.bytesWritten
   }
 
 //////////////////////////////////////////////////////////////////////////
@@ -156,9 +155,15 @@ abstract const class HelixMod : WebMod
   private Void trace(WebReq req, WebRes res, Duration time)
   {
     date := DateTime.now.toLocale("kk::mm::ss") // DD-MMM-YY")
+    stat := res.statusCode
     enc  := res.headers["Content-Encoding"] ?: "uncompressed"
     len  := resSize.toLocale("B")
-    log.trace("> [${date}] ${req.method} \"${req.uri}\" (${enc}, ${len}, ${time.toLocale})")
+
+    msg  := "> [${date}] ${req.method} \"${req.uri}\" (${stat}, "
+    if (stat == 200) msg += "${enc}, ${len}, "
+    msg += "${time.toLocale})"
+
+    log.trace(msg)
   }
 
   // TODO: not sure how this works yet
