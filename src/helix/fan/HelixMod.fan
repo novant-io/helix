@@ -152,7 +152,7 @@ abstract const class HelixMod : WebMod
 //////////////////////////////////////////////////////////////////////////
 
   ** Subclass hook to customize logging requests.
-  protected Void traceReq(WebReq req, WebRes res, Duration dur)
+  protected virtual Void traceReq(WebReq req, WebRes res, Duration dur)
   {
     date := DateTime.now.toLocale("kk::mm::ss")
     stat := res.statusCode
