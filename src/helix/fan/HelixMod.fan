@@ -151,7 +151,7 @@ abstract const class HelixMod : WebMod
 // Logging
 //////////////////////////////////////////////////////////////////////////
 
-  // TODO: not sure how this works yets
+  // TODO: not sure how this works yet
   private Void trace(WebReq req, WebRes res, Duration time)
   {
     date := DateTime.now.toLocale("kk::mm::ss") // DD-MMM-YY")
@@ -159,12 +159,16 @@ abstract const class HelixMod : WebMod
     enc  := res.headers["Content-Encoding"] ?: "uncompressed"
     len  := resSize.toLocale("B")
 
-    msg  := "> [${date}] ${req.method} \"${req.uri}\" (${stat}, "
+    msg  := "[${date}] ${req.method} \"${req.uri}\" (${stat}, "
     if (stat == 200) msg += "${enc}, ${len}, "
     msg += "${time.toLocale})"
 
-    log.trace(msg)
+    log.trace("> ${msg}")
+    onLogTrace(msg)
   }
+
+  // TODO: not sure how this works yet
+  protected virtual Void onLogTrace(Str msg) {}
 
   // TODO: not sure how this works yet
   internal const HelixLog log
