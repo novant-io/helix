@@ -44,10 +44,10 @@ abstract const class HelixMod : WebMod
   ** Service incoming request.
   override Void onService()
   {
+    st := Duration.now
     try
     {
       // set mod
-      st := Duration.now
       req.mod = this
 
       // init args so HelixController.make can be used
@@ -78,8 +78,6 @@ abstract const class HelixMod : WebMod
 
       // cleanup
       args.cleanup
-      et := Duration.now
-      traceReq(req, res, et-st)
     }
     catch (Err origErr)
     {
@@ -95,6 +93,16 @@ abstract const class HelixMod : WebMod
 
       // else err callback
       onServiceErr(err)
+    }
+    finally
+    {
+      // trace request
+      try
+      {
+        et := Duration.now
+        traceReq(req, res, et-st)
+      }
+      catch (Err err) { err.trace }
     }
   }
 
