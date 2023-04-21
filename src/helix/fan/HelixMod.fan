@@ -45,6 +45,7 @@ abstract const class HelixMod : WebMod
   override Void onService()
   {
     st := Duration.now
+    HelixErr? err
     try
     {
       // set mod
@@ -81,11 +82,8 @@ abstract const class HelixMod : WebMod
     }
     catch (Err origErr)
     {
-      // TODO FIXIT
-      log.trace("ERR: $req.uri", origErr)
-
       // wrap err if not already HelixErr
-      err := origErr as HelixErr
+      err = origErr as HelixErr
       if (err == null) err = HelixErr(500, origErr)
 
       // first check if this was a redirect
@@ -97,12 +95,8 @@ abstract const class HelixMod : WebMod
     finally
     {
       // trace request
-      try
-      {
-        et := Duration.now
-        traceReq(req, res, et-st)
-      }
-      catch (Err err) { err.trace }
+      et := Duration.now
+      traceReq(req, res, et-st, err)
     }
   }
 
@@ -164,17 +158,21 @@ abstract const class HelixMod : WebMod
 //////////////////////////////////////////////////////////////////////////
 
   ** Subclass hook to customize logging requests.
-  protected virtual Void traceReq(WebReq req, WebRes res, Duration dur)
+  protected virtual Void traceReq(WebReq req, WebRes res, Duration dur, HelixErr? err)
   {
     date := DateTime.now.toLocale("kk::mm::ss")
     stat := res.statusCode
     enc  := res.headers["Content-Encoding"] ?: "uncompressed"
     len  := resSize.toLocale("B")
 
+    // trace req
     msg  := "> [${date}] ${req.method} \"${req.uri}\" (${stat}, "
     if (stat == 200) msg += "${enc}, ${len}, "
     msg += "${dur.toLocale})"
     log.trace(msg)
+
+    // trace stack trace
+    if (err != null) log.trace("> ${err.msg}", err)
   }
 
   // TODO: not sure how this works yet
