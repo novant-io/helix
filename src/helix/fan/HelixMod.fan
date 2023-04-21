@@ -50,6 +50,10 @@ abstract const class HelixMod : WebMod
       st := Duration.now
       req.mod = this
 
+      // init args so HelixController.make can be used
+      // even if no route mates in onServiceErr
+      Actor.locals["helix.args"] = HelixArgs.defVal
+
       // match req to Route
       match := router.match(req.modRel, req.method)
       if (match == null) throw HelixErr(404)
