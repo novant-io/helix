@@ -22,6 +22,10 @@ abstract class BuildHelixPod : BuildPod
   ** the Fanbar source templates to compile.
   Uri[]? fbsDirs
 
+  ** List of Uris relative to build script of directories containing
+  ** the source images to copy and/or compress.
+  Uri[]? imgDirs
+
   ** Compile the source into a pod file and all associated natives.
   ** See `compileFan`, `compileJava`, and `compileFbs`.
   @Target { help = "Compile to pod file and associated natives" }
@@ -40,6 +44,7 @@ abstract class BuildHelixPod : BuildPod
     // compileDotnet
     compileFass
     compileFbs
+    compressImg
     log.unindent
   }
 
@@ -59,5 +64,14 @@ abstract class BuildHelixPod : BuildPod
     // short-circuit if source dirs
     fbsDirs = this.fbsDirs ?: Uri#.emptyList
     if (fbsDirs.size > 0) CompileFbs(this).run
+  }
+
+  ** Compile Fanbar templates if `fbsDirs` is configured.
+  @Target { help = "Compress image resources" }
+  virtual Void compressImg()
+  {
+    // short-circuit if source dirs
+    imgDirs = this.imgDirs ?: Uri#.emptyList
+    if (imgDirs.size > 0) CompressImg(this).run
   }
 }
