@@ -99,7 +99,7 @@ const class HelixArgs
   Int reqInt(Str name)
   {
     v := reqStr(name)
-    i := v.toInt(10, false) ?: throw ArgErr("invalid value '${v}'")
+    i := v.toInt(10, false) ?: throw ArgErr("invalid int value '${v}'")
     return i
   }
 
@@ -115,12 +115,20 @@ const class HelixArgs
     catch (Err err) throw ArgErr("invalid value '${v}'", err)
   }
 
+  ** Get a required arg as 'Float' or throw error.
+  Float reqFloat(Str name)
+  {
+    v := reqStr(name)
+    f := v.toFloat(false) ?: throw ArgErr("invalid float value '${v}'")
+    return f
+  }
+
   ** Get a required arg as 'Bool' or throw error.
   Bool reqBool(Str name)
   {
     v := reqStr(name)
     b := Bool.fromStr(v, false)
-    if (b == null) throw ArgErr("invalid value '${v}'")
+    if (b == null) throw ArgErr("invalid bool value '${v}'")
     return b
   }
 
@@ -128,7 +136,7 @@ const class HelixArgs
   Date reqDate(Str name, Str format := "YYYY-MM-DD")
   {
     v := reqStr(name)
-    d := Date.fromLocale(v, format, false) ?: throw ArgErr("invalid valud '${v}'")
+    d := Date.fromLocale(v, format, false) ?: throw ArgErr("invalid date value '${v}'")
     return d
   }
 
@@ -159,6 +167,15 @@ const class HelixArgs
     v := optStr(name)?.trimToNull
     if (v == null) return null
     return v.toInt(10, false) ?: throw ArgErr("invalid int value '${v}'")
+  }
+
+  ** Get an optional arg as 'Float' or 'null' if not found.
+  ** Throws 'ArgErr' if value exists but invalid.
+  Float? optFloat(Str name)
+  {
+    v := optStr(name)?.trimToNull
+    if (v == null) return null
+    return v.toFloat(false) ?: throw ArgErr("invalid float value '${v}'")
   }
 
   ** Get an optional arg as 'Bool' or 'null' if not error.
