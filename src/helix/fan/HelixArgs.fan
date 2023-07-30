@@ -140,12 +140,20 @@ const class HelixArgs
     return d
   }
 
-  ** Get a required file arg as 'InStream' or throw error.
+  ** Get a required file arg as 'File' or throw error.
   File reqFile(Str name)
   {
-    v := req(name)
-    if (v isnot File) throw ArgErr("invalid value '${v}'")
-    return v
+    // TODO FIXIT: cleanup 'req' checks so logic is DRY in optXxx
+    optFile(name) ?: throw ArgErr("missing required argument '$name'")
+  }
+
+  ** Get a required file content as 'Str' or throw error. This method
+  ** differs from 'reqFile(name).in.readAllStr' in that it will attempt
+  ** to sniff UTF BOM encoding makers.
+  Str reqFileStr(Str name)
+  {
+    // TODO FIXIT: cleanup 'req' checks so logic is DRY in optXxx
+    optFileStr(name) ?: throw ArgErr("missing required argument '$name'")
   }
 
   ** Get an optional arg as 'Str' or 'null' if not found.
@@ -195,14 +203,60 @@ const class HelixArgs
     return Date.fromLocale(v, format, false) ?: throw ArgErr("invalid date value '${v}'")
   }
 
-  ** Get an optional file arg as 'InStream' or 'null' if not found.
+  ** Get an optional file arg as 'File' or 'null' if not found.
   ** Throws 'ArgErr' if value exists but invalid.
   File? optFile(Str name)
   {
-    v :=  map[name]
+    v := map[name]
     if (v == null) return null
     if (v isnot File) throw ArgErr("invalid file value '${v}'")
     return v
+  }
+
+  ** Get an optional file content as 'Str' or 'null' if not found.
+  ** Throws 'ArgErr' if value exists but invalid. This method differs
+  ** from 'reqFile(name).in.readAllStr' in that it will attempt to
+  ** sniff UTF BOM encoding makers.
+  Str? optFileStr(Str name)
+  {
+    // short-circuit if file not found
+    file := optFile(name)
+    if (file == null) return null
+
+    try
+    {
+      // check for BOM marker or if not reconzied, assume ASCII
+      in := file.in
+      switch (in.peek)
+      {
+        // UTF-8 - standard practice is to omit the BOM for UTF-8;
+        // but MS likes to include them, so check. The default
+        // charset is UTF-8; but set here for code clarity
+        case 0xef:
+          in.read
+          if (in.read != 0xbb) throw IOErr("Invalid UTF-8 BOM")
+          if (in.read != 0xbf) throw IOErr("Invalid UTF-8 BOM")
+          in.charset = Charset.utf8
+
+        // TODO: not tested
+        // UTF-16 Big Endian
+        case 0xfe:
+          in.read
+          if (in.read != 0xff) throw IOErr("Invalid UTF-16 BOM")
+          in.charset = Charset.utf16BE
+
+        // TODO: not tested
+        // UTF-16 Little Endian
+        case 0xff:
+          in.read
+          if (in.read != 0xfe) throw IOErr("Invalid UTF-16 BOM")
+          in.charset = Charset.utf16LE
+      }
+
+      // encoding should be set now, so read string content
+      return in.readAllStr
+    }
+    catch (Err err) throw ArgErr("invalid file content '${file}'")
   }
 
   ** Iterate each argument in instnace.
