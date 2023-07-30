@@ -256,7 +256,7 @@ const class HelixArgs
       // encoding should be set now, so read string content
       return in.readAllStr
     }
-    catch (Err err) throw ArgErr("invalid file content '${file}'")
+    catch (Err err) throw ArgErr("invalid file content '${name}'", err)
   }
 
   ** Iterate each argument in instnace.
