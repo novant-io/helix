@@ -8,6 +8,7 @@
 
 using concurrent
 using web
+using util
 
 **
 ** HelixArgs captures arguments to a Controller request, which may
@@ -20,6 +21,7 @@ const class HelixArgs
   **   - URI route param
   **   - URI query param
   **   - Form value
+  **   - JSON request content
   **
   ** Where 'key' may not exist more than once.
   **
@@ -34,6 +36,18 @@ const class HelixArgs
       req.parseMultiPartForm |k,in,h| {
         map.add(k, parsePart(h, in))
       }
+    }
+    if (req.headers["Content-Type"]?.contains("application/json") == true)
+    {
+      // TODO: for now we require top object to be a map type
+      try
+      {
+        Str:Obj? m := JsonInStream(req.in).readJson
+        m.each |v,k| {
+          if (v != null) map.add(k, v)
+        }
+      }
+      catch (Err err) { throw IOErr("Invalid json", err) }
     }
     return HelixArgs(map)
   }
