@@ -154,6 +154,18 @@ const class HelixArgs
     return d
   }
 
+  ** Get a required arg as 'List' or throw error.
+  List? reqList(Str name)
+  {
+    optList(name) ?: throw ArgErr("missing required argument '$name'")
+  }
+
+  ** Get a required arg as 'Map' or throw error.
+  Map? reqMap(Str name)
+  {
+    optMap(name) ?: throw ArgErr("missing required argument '$name'")
+  }
+
   ** Get a required file arg as 'File' or throw error.
   File reqFile(Str name)
   {
@@ -215,6 +227,24 @@ const class HelixArgs
     v := optStr(name)?.trimToNull
     if (v == null) return null
     return Date.fromLocale(v, format, false) ?: throw ArgErr("invalid date value '${v}'")
+  }
+
+  ** Get an optional arg as 'List' or 'null' if not found.
+  List? optList(Str name)
+  {
+    v := map[name]
+    if (v == null) return null
+    if (v isnot List) throw ArgErr("invalid list value '${v}'")
+    return v
+  }
+
+  ** Get an optional arg as 'Map' or 'null' if not found.
+  Map? optMap(Str name)
+  {
+    v := map[name]
+    if (v == null) return null
+    if (v isnot Map) throw ArgErr("invalid map value '${v}'")
+    return v
   }
 
   ** Get an optional file arg as 'File' or 'null' if not found.
