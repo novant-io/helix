@@ -30,7 +30,10 @@ const class HelixArgs
     map := Str:Obj[:]
     map.addAll(routeArgs)
     map.addAll(req.uri.query)
-    if (req.form != null) map.addAll(req.form)
+    // TODO FIXIT: seeing some bug on redirects where content-type header
+    // is getting sent on following GET req which trips up WebReq.form; so
+    // only check this if a POST
+    if (req.method == "POST" && req.form != null) map.addAll(req.form)
     if (req.headers["Content-Type"]?.contains("multipart/form-data") == true)
     {
       req.parseMultiPartForm |k,in,h| {
