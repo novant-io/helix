@@ -28,6 +28,6 @@ const class HelixFile
   ** Get an `sys::Instream` instance to read file contents.
   InStream in() { temp.in }
 
-  // backing temp file contents
-  private const File temp
+  ** Backing temp `File` instance.
+  @NoDoc const File temp
 }
