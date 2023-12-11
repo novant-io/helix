@@ -258,7 +258,7 @@ const class HelixArgs
   {
     v := map[name]
     if (v == null) return null
-    if (v isnot File) throw ArgErr("invalid file value '${v}'")
+    if (v isnot HelixFile) throw ArgErr("invalid file value '${v}'")
     return v
   }
 
