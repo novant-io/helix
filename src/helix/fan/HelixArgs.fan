@@ -72,7 +72,9 @@ const class HelixArgs
     x := f[f.indexr(".")..-1]
     t := File.createTemp("helix-", x, Env.cur.tempDir)
     o := t.out; in.pipe(o); o.sync.close
-    return t
+
+    // wrap in HelixFile
+    return HelixFile(f, t)
   }
 
   ** Private ctor.
@@ -170,7 +172,7 @@ const class HelixArgs
   }
 
   ** Get a required file arg as 'File' or throw error.
-  File reqFile(Str name)
+  HelixFile reqFile(Str name)
   {
     // TODO FIXIT: cleanup 'req' checks so logic is DRY in optXxx
     optFile(name) ?: throw ArgErr("missing required argument '$name'")
@@ -252,7 +254,7 @@ const class HelixArgs
 
   ** Get an optional file arg as 'File' or 'null' if not found.
   ** Throws 'ArgErr' if value exists but invalid.
-  File? optFile(Str name)
+  HelixFile? optFile(Str name)
   {
     v := map[name]
     if (v == null) return null
