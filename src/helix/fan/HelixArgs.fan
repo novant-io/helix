@@ -159,6 +159,12 @@ const class HelixArgs
     return d
   }
 
+  ** Get a required arg as 'Duration' or throw error.
+  Duration reqDuration(Str name)
+  {
+    optDuration(name) ?: throw ArgErr("missing required argument '$name'")
+  }
+
   ** Get a required arg as 'List' or throw error.
   List? reqList(Str name)
   {
@@ -232,6 +238,14 @@ const class HelixArgs
     v := optStr(name)?.trimToNull
     if (v == null) return null
     return Date.fromLocale(v, format, false) ?: throw ArgErr("invalid date value '${v}'")
+  }
+
+  ** Get an optional arg as 'Duration' or 'null' if not found.
+  Duration? optDuration(Str name)
+  {
+    v := optStr(name)?.trimToNull
+    if (v == null) return null
+    return Duration.fromStr(v, false) ?: throw ArgErr("invalid duration value '${v}'")
   }
 
   ** Get an optional arg as 'List' or 'null' if not found.
@@ -313,6 +327,9 @@ const class HelixArgs
   {
     map.each(f)
   }
+
+  ** Get a Str:Obj of arguments from this instance.
+  @NoDoc Str:Obj toMap() { map }
 
   override Str toStr() { map.toStr }
 
