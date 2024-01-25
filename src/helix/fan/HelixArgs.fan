@@ -96,6 +96,14 @@ const class HelixArgs
     return v
   }
 
+  ** Return 'true' if given name exists in argument list, even
+  ** if value is 'null'.  See also `hasNotNull`.
+  Bool has(Str name) { map.containsKey(name) }
+
+  ** Return 'true' if given name exists in argument list and
+  ** the value is non-null. See also `has`
+  Bool hasNotNull(Str name) { map[name] != null }
+
   ** Get a required arg as 'Str' or throw error.
   Str reqStr(Str name) { req(name).toStr }
 
