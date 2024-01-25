@@ -214,6 +214,14 @@ const class HelixArgs
     return v.toInt(10, false) ?: throw ArgErr("invalid int value '${v}'")
   }
 
+  ** Get an optional arg as 'Int' or 'null' if not found, or 'null'
+  ** if value is < 0. Throws 'ArgErr' if value exists but invalid.
+  Int? optIntNotNeg(Str name)
+  {
+    v := optInt(name)
+    return v < 0 ? null : v
+  }
+
   ** Get an optional arg as 'Float' or 'null' if not found.
   ** Throws 'ArgErr' if value exists but invalid.
   Float? optFloat(Str name)
