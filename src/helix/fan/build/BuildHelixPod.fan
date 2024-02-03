@@ -26,6 +26,9 @@ abstract class BuildHelixPod : BuildPod
   ** the source images to copy and/or compress.
   Uri[]? imgDirs
 
+  // ** TinyPng API key used to compress images.
+  // Str? tinyPngKey
+
   ** Compile the source into a pod file and all associated natives.
   ** See `compileFan`, `compileJava`, and `compileFbs`.
   @Target { help = "Compile to pod file and associated natives" }

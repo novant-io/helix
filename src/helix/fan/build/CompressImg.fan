@@ -30,6 +30,12 @@ internal class CompressImg : Task
       log.info("Images [$helix.podName]")
       log.indent
 
+      // check for compression key
+      TinyPng? tiny
+      // key := helix.tinyPngKey
+      // if (key == null) log.info("** WARN: no key found; no compression performed **")
+      // else tiny = TinyPng(key)
+
       imgDirs := helix.imgDirs.map |u| { helix.scriptDir + u }
       tempDir := helix.scriptDir + `temp-fbs/`
       outImg  := tempDir + `img/`
@@ -52,8 +58,19 @@ internal class CompressImg : Task
       {
         try
         {
-          // TODO FIXIT: check compress
-          f.copyTo(outImg + `${f.name}`)
+          outfile := outImg + `${f.name}`
+          if (tiny != null && extMap[f.ext] == true)
+          {
+            // TODO: we need to check if !modified so we don't rerun
+            // does this require a staging dir to be kept around?
+            // compress
+            tiny.compress(f, outfile)
+          }
+          else
+          {
+            // copy
+            f.copyTo(outfile)
+          }
         }
         catch (Err err)
         {
