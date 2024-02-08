@@ -97,6 +97,15 @@ class HelixRenderer
     out.flush.close
   }
 
+  ** Render the given HTML text to 'res.out' using content
+  ** type '"text/html; charset=utf-8"'.
+  virtual Void renderHtml(Str html)
+  {
+    res.statusCode = this.statusCode
+    res.headers["Content-Type"] = "text/html; charset=utf-8"
+    setupGzip.print(html).flush.close
+  }
+
   ** Render given inline template and data to 'res.out' using
   ** content type '"text/html; charset=utf-8"'.
   virtual Void renderInline(Str template, Str:Obj? data := [:])
