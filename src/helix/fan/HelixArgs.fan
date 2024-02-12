@@ -70,7 +70,7 @@ const class HelixArgs
     // dump contents into temp file
     f := m.group(1)
     x := f[f.indexr(".")..-1]
-    t := File.createTemp("helix-", x, Env.cur.tempDir)
+    t := File.createTemp("helix-", x, Env.cur.tempDir).deleteOnExit
     o := t.out; in.pipe(o); o.sync.close
 
     // wrap in HelixFile
