@@ -79,17 +79,20 @@
   ** OS name or 'null' if unknown.
   const Str? os := null
 
-  ** OS version or 'null' if unknown.
-  const Str? osVer := null
+  // TODO?
+  // ** OS version or 'null' if unknown.
+  // const Str? osVer := null
 
-  ** Device name or 'null if unknown.
-  const Str? device := null
+  // TODO?
+  // ** Device name or 'null if unknown.
+  // const Str? device := null
 
   override Str toStr()
   {
     buf := StrBuf()
     buf.add(name)
     if (ver != null) buf.addChar(' ').add(ver)
+    if (os  != null) buf.add(" on ").add(os)
     return buf.toStr
   }
 }

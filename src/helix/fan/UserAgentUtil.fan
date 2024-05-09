@@ -37,11 +37,48 @@
       }
     }
 
+    // must have mozilla/5.0 to match anything
+    if (m == null) return null
 
-    // map to browser
-    if (c != null) return BrowserAgent { it.name="Chrome";  it.ver=c.ver }
-    if (f != null) return BrowserAgent { it.name="Firefox"; it.ver=f.ver }
-    if (s != null && v != null) return BrowserAgent { it.name="Safari"; it.ver=v.ver }
+    // TODO: really bad; but test first char for perfomrance
+    // os/device
+    Str? os
+    switch (m.comment?.getSafe(0))
+    {
+      case 'M': os = "macOS"
+      case 'i': os = "iOS"
+      case 'W': os = "Windows"
+    }
+
+    // chrome
+    if (c != null)
+    {
+      return BrowserAgent {
+        it.name = c.name
+        it.ver  = c.ver
+        it.os   = os
+      }
+    }
+
+    // firefox
+    if (f != null)
+    {
+      return BrowserAgent {
+        it.name = f.name
+        it.ver  = f.ver
+        it.os   = os
+      }
+    }
+
+    // safari
+    if (s != null && v != null)
+    {
+      return BrowserAgent {
+        it.name = s.name
+        it.ver  = v.ver
+        it.os   = os
+      }
+    }
 
     // no match found
     return null
