@@ -19,22 +19,27 @@ class UserAgentTest : Test
     // empty
     ua := UserAgent("")
     verifyEq(ua.products.size, 0)
+    verifyEq(ua.browser, null)
     verifyUA(ua, [[,]])
 
     // simple (no ver/comment)
     ua = UserAgent("foo")
+    verifyEq(ua.browser, null)
     verifyUA(ua, [["foo", null, null]])
 
     // simple (no comment)
     ua = UserAgent("foo/12")
+    verifyEq(ua.browser, null)
     verifyUA(ua, [["foo", "12", null]])
 
     // simple
     ua = UserAgent("foo/12 (some; comment)")
+    verifyEq(ua.browser, null)
     verifyUA(ua, [["foo", "12", "some; comment"]])
 
     // multi simple (no ver/comment)
     ua = UserAgent("foo bar zar")
+    verifyEq(ua.browser, null)
     verifyUA(ua, [
       ["foo", null, null],
       ["bar", null, null],
@@ -43,6 +48,7 @@ class UserAgentTest : Test
 
     // multi simple (no ver/comment)
     ua = UserAgent("foo/1 bar/2 zar/3")
+    verifyEq(ua.browser, null)
     verifyUA(ua, [
       ["foo", "1", null],
       ["bar", "2", null],
@@ -51,6 +57,7 @@ class UserAgentTest : Test
 
     // multi simple (no ver/comment)
     ua = UserAgent("foo bar/2 zar/3")
+    verifyEq(ua.browser, null)
     verifyUA(ua, [
       ["foo", null, null],
       ["bar", "2", null],
@@ -59,6 +66,7 @@ class UserAgentTest : Test
 
     // multi simple (no ver/comment)
     ua = UserAgent("foo/1 bar zar/3")
+    verifyEq(ua.browser, null)
     verifyUA(ua, [
       ["foo", "1", null],
       ["bar", null, null],
@@ -70,6 +78,7 @@ class UserAgentTest : Test
   {
     // Safari 17.5 (macOS)
     ua := UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15")
+    verifyEq(ua.browser.toStr, "Safari 17.4")
     verifyUA(ua, [
       ["Mozilla",     "5.0",      "Macintosh; Intel Mac OS X 10_15_7"],
       ["AppleWebKit", "605.1.15", "KHTML, like Gecko"],
@@ -77,8 +86,20 @@ class UserAgentTest : Test
       ["Safari",      "605.1.15", null],
     ])
 
+    // Safari 17.4.1 (iOS)
+    ua = UserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.1")
+    verifyEq(ua.browser.toStr, "Safari 17.4.1")
+    verifyUA(ua, [
+      ["Mozilla",     "5.0",      "iPhone; CPU iPhone OS 17_4_1 like Mac OS X"],
+      ["AppleWebKit", "605.1.15", "KHTML, like Gecko"],
+      ["Version",     "17.4.1",   null],
+      ["Mobile",      "15E148",   null],
+      ["Safari",      "604.1",    null],
+    ])
+
     // Firefox 125 (Windows 10)
     ua = UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0")
+    verifyEq(ua.browser.toStr, "Firefox 125.0")
     verifyUA(ua, [
       ["Mozilla", "5.0",      "Windows NT 10.0; Win64; x64; rv:125.0"],
       ["Gecko",   "20100101", null],
@@ -87,6 +108,7 @@ class UserAgentTest : Test
 
     // Chrome 123 (Windows 10)
     ua = UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+    verifyEq(ua.browser.toStr, "Chrome 124.0.0.0")
     verifyUA(ua, [
       ["Mozilla",     "5.0",       "Windows NT 10.0; Win64; x64"],
       ["AppleWebKit", "537.36",    "KHTML, like Gecko"],
@@ -95,7 +117,7 @@ class UserAgentTest : Test
     ])
   }
 
-  Void verifyUA(UserAgent ua, Str?[][] prods)
+  private Void verifyUA(UserAgent ua, Str?[][] prods)
   {
     ua.products.each |p,i|
     {

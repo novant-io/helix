@@ -21,7 +21,36 @@
 
   ** Browser agent if this user agent represents a web browser,
   ** or 'null' if not applicable.
-  once BrowserAgent? browser() { null }
+  once BrowserAgent? browser()
+  {
+    // short-circuit if no products
+    if (products.isEmpty) return null
+
+    UaProduct? v := null  // Version/xx
+    UaProduct? s := null  // Safari/xx
+    UaProduct? c := null  // Chrome/xx
+    UaProduct? f := null  // Firefox/xx
+
+    // iterate products to find matrix
+    products.each |p|
+    {
+      switch (p.name)
+      {
+        case "Version": v = p
+        case "Safari":  s = p
+        case "Chrome":  c = p
+        case "Firefox": f = p
+      }
+    }
+
+    // map to browser
+    if (c != null) return BrowserAgent { it.name="Chrome";  it.ver=c.ver }
+    if (f != null) return BrowserAgent { it.name="Firefox"; it.ver=f.ver }
+    if (s != null && v != null) return BrowserAgent { it.name="Safari"; it.ver=v.ver }
+
+    // no match found
+    return null
+  }
 
   ** Original user-agent string for this instance.
   override const Str toStr
@@ -161,4 +190,12 @@
 
   ** Device name or 'null if unknown.
   const Str? device := null
+
+  override Str toStr()
+  {
+    buf := StrBuf()
+    buf.add(name)
+    if (ver != null) buf.addChar(' ').add(ver)
+    return buf.toStr
+  }
 }
