@@ -134,6 +134,28 @@ class UserAgentTest : Test
       ["Chrome",      "124.0.0.0", null],
       ["Safari",      "537.36",    null],
     ])
+
+    // Edge 124.0.2478.97 (Windows)
+    ua = UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.2478.97")
+    verifyEq(ua.browser.toStr, "Edge 124.0.2478.97 (Windows)")
+    verifyUA(ua, [
+      ["Mozilla",     "5.0",           "Windows NT 10.0; Win64; x64"],
+      ["AppleWebKit", "537.36",        "KHTML, like Gecko"],
+      ["Chrome",      "124.0.0.0",     null],
+      ["Safari",      "537.36",        null],
+      ["Edg",         "124.0.2478.97", null],
+    ])
+
+    // Edge 124.0.2478.97 (macOS)
+    ua = UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.2478.97")
+    verifyEq(ua.browser.toStr, "Edge 124.0.2478.97 (macOS)")
+    verifyUA(ua, [
+      ["Mozilla",     "5.0",           "Macintosh; Intel Mac OS X 10_15_7"],
+      ["AppleWebKit", "537.36",        "KHTML, like Gecko"],
+      ["Chrome",      "124.0.0.0",     null],
+      ["Safari",      "537.36",        null],
+      ["Edg",         "124.0.2478.97", null],
+    ])
   }
 
   private Void verifyUA(UserAgent ua, Str?[][] prods)

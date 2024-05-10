@@ -23,6 +23,7 @@
     UaProduct? s := null  // Safari/xx
     UaProduct? c := null  // Chrome/xx
     UaProduct? f := null  // Firefox/xx
+    UaProduct? e := null  // Edg/xx
 
     // iterate products to find matrix
     ua.products.each |p|
@@ -34,6 +35,7 @@
         case "Safari":  s = p
         case "Chrome":  c = p
         case "Firefox": f = p
+        case "Edg":     e = p
       }
     }
 
@@ -48,6 +50,16 @@
       case 'M': os = "macOS"
       case 'i': os = "iOS"
       case 'W': os = "Windows"
+    }
+
+    // edge
+    if (e != null)
+    {
+      return BrowserAgent {
+        it.name = "Edge"
+        it.ver  = e.ver
+        it.os   = os
+      }
     }
 
     // chrome
