@@ -78,7 +78,7 @@ class UserAgentTest : Test
   {
     // Safari 17.5 (macOS)
     ua := UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15")
-    verifyEq(ua.browser.toStr, "Safari 17.4 on macOS")
+    verifyEq(ua.browser.toStr, "Safari 17.4 (macOS)")
     verifyUA(ua, [
       ["Mozilla",     "5.0",      "Macintosh; Intel Mac OS X 10_15_7"],
       ["AppleWebKit", "605.1.15", "KHTML, like Gecko"],
@@ -88,7 +88,7 @@ class UserAgentTest : Test
 
     // Safari 17.4.1 (iOS)
     ua = UserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.1")
-    verifyEq(ua.browser.toStr, "Safari 17.4.1 on iOS")
+    verifyEq(ua.browser.toStr, "Safari 17.4.1 (iOS)")
     verifyUA(ua, [
       ["Mozilla",     "5.0",      "iPhone; CPU iPhone OS 17_4_1 like Mac OS X"],
       ["AppleWebKit", "605.1.15", "KHTML, like Gecko"],
@@ -99,7 +99,7 @@ class UserAgentTest : Test
 
     // Firefox 125 (macOS)
     ua = UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 14.4; rv:125.0) Gecko/20100101 Firefox/125.0")
-    verifyEq(ua.browser.toStr, "Firefox 125.0 on macOS")
+    verifyEq(ua.browser.toStr, "Firefox 125.0 (macOS)")
     verifyUA(ua, [
       ["Mozilla", "5.0",      "Macintosh; Intel Mac OS X 14.4; rv:125.0"],
       ["Gecko",   "20100101", null],
@@ -108,7 +108,7 @@ class UserAgentTest : Test
 
     // Firefox 125 (Windows 10)
     ua = UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0")
-    verifyEq(ua.browser.toStr, "Firefox 125.0 on Windows")
+    verifyEq(ua.browser.toStr, "Firefox 125.0 (Windows)")
     verifyUA(ua, [
       ["Mozilla", "5.0",      "Windows NT 10.0; Win64; x64; rv:125.0"],
       ["Gecko",   "20100101", null],
@@ -117,7 +117,7 @@ class UserAgentTest : Test
 
     // Chrome 124 (macOS)
     ua = UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
-    verifyEq(ua.browser.toStr, "Chrome 124.0.0.0 on macOS")
+    verifyEq(ua.browser.toStr, "Chrome 124.0.0.0 (macOS)")
     verifyUA(ua, [
       ["Mozilla",     "5.0",       "Macintosh; Intel Mac OS X 14_4_1"],
       ["AppleWebKit", "537.36",    "KHTML, like Gecko"],
@@ -127,7 +127,7 @@ class UserAgentTest : Test
 
     // Chrome 123 (Windows 10)
     ua = UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
-    verifyEq(ua.browser.toStr, "Chrome 124.0.0.0 on Windows")
+    verifyEq(ua.browser.toStr, "Chrome 124.0.0.0 (Windows)")
     verifyUA(ua, [
       ["Mozilla",     "5.0",       "Windows NT 10.0; Win64; x64"],
       ["AppleWebKit", "537.36",    "KHTML, like Gecko"],

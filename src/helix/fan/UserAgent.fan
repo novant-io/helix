@@ -92,7 +92,7 @@
     buf := StrBuf()
     buf.add(name)
     if (ver != null) buf.addChar(' ').add(ver)
-    if (os  != null) buf.add(" on ").add(os)
+    if (os  != null) buf.addChar(' ').addChar('(').add(os).addChar(')')
     return buf.toStr
   }
 }
