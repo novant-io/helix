@@ -50,6 +50,7 @@
       case 'M': os = "macOS"
       case 'i': os = "iOS"
       case 'W': os = "Windows"
+      case 'X': os = "Linux"
     }
 
     // edge

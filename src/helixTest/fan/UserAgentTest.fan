@@ -115,6 +115,15 @@ class UserAgentTest : Test
       ["Firefox", "125.0",    null],
     ])
 
+    // Firefox 125 (Linux)
+    ua = UserAgent("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0")
+    verifyEq(ua.browser.toStr, "Firefox 125.0 (Linux)")
+    verifyUA(ua, [
+      ["Mozilla", "5.0",      "X11; Ubuntu; Linux x86_64; rv:125.0"],
+      ["Gecko",   "20100101", null],
+      ["Firefox", "125.0",    null],
+    ])
+
     // Chrome 124 (macOS)
     ua = UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
     verifyEq(ua.browser.toStr, "Chrome 124.0.0.0 (macOS)")
@@ -132,6 +141,16 @@ class UserAgentTest : Test
       ["Mozilla",     "5.0",       "Windows NT 10.0; Win64; x64"],
       ["AppleWebKit", "537.36",    "KHTML, like Gecko"],
       ["Chrome",      "124.0.0.0", null],
+      ["Safari",      "537.36",    null],
+    ])
+
+    // Chrome 125 (Linux)
+    ua = UserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36")
+    verifyEq(ua.browser.toStr, "Chrome 125.0.0.0 (Linux)")
+    verifyUA(ua, [
+      ["Mozilla",     "5.0",       "X11; Linux x86_64"],
+      ["AppleWebKit", "537.36",    "KHTML, like Gecko"],
+      ["Chrome",      "125.0.0.0", null],
       ["Safari",      "537.36",    null],
     ])
 
