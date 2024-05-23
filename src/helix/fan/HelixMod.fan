@@ -31,6 +31,19 @@ abstract const class HelixMod : WebMod
   ** Router model.
   const Router router
 
+  **
+  ** If 'true', convenience to block all crawlers by serving the
+  ** following content for 'GET' requests to '/robots.txt':
+  **
+  **   User-agent: *
+  **   Disallow: /
+  **
+  ** If this field is 'false', requests to '/robots.txt' will
+  ** default to '404 Not Found'. To customize the response, create
+  ** a new route and controller endpoint.
+  **
+  const Bool blockRobots := false
+
 //////////////////////////////////////////////////////////////////////////
 // Service
 //////////////////////////////////////////////////////////////////////////
@@ -56,9 +69,17 @@ abstract const class HelixMod : WebMod
       Actor.locals["helix.args"] = HelixArgs.defVal
 
       // match req to Route
-      match := router.match(req.modRel, req.method)
-      if (match == null) throw HelixErr(404)
-      req.stash["helix.route"] = match.route
+      RouteMatch? match
+      if (blockRobots && req.uri.path.first == "robots.txt")
+      {
+        match = RouteMatch(blockRobotsRoute, [:])
+      }
+      else
+      {
+        match = router.match(req.modRel, req.method)
+        if (match == null) throw HelixErr(404)
+        req.stash["helix.route"] = match.route
+      }
 
       // create and cache args
       args := HelixArgs(req, match.args)
@@ -127,6 +148,10 @@ abstract const class HelixMod : WebMod
     bout := req.stash["helix.out"] as ByteCountOutStream
     return bout == null ? 0 : bout.bytesWritten
   }
+
+  // only used for blockRobots
+  private const Route blockRobotsRoute := Route("/robots.txt", "GET", RobotsController#block)
+  private const Str:Str emptyArgs := [:]
 
 //////////////////////////////////////////////////////////////////////////
 // Lifecycle
