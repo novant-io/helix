@@ -1,6 +1,6 @@
 //
-// Copyright (c) 2023, Novant LLC
-// All Rights Reserved
+// Copyright (c) 2023, Andy Frank
+// Licensed under the MIT License
 //
 // History:
 //   11 Dec 2023  Andy Frank  Creation
