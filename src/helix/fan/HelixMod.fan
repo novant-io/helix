@@ -124,6 +124,11 @@ abstract const class HelixMod : WebMod
   ** Callback when an error occured during `onService`.
   virtual Void onServiceErr(HelixErr err)
   {
+    // TODO FIXIT: be nice to check errJson here and
+    // auto handle JSON errors; but Renderer workflow
+    // is not quite right to support
+    // (see HelixRenderer.sendErr)
+
     res.sendErr(err.errCode)
   }
 
