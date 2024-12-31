@@ -196,13 +196,10 @@ abstract const class HelixMod : WebMod
     len  := resSize.toLocale("B")
 
     // trace req
-    msg  := "> [${date}] ${req.method} \"${req.uri}\" (${stat}, "
+    msg  := "[${date}] ${req.method} \"${req.uri}\" (${stat}, "
     if (stat == 200) msg += "${enc}, ${len}, "
     msg += "${dur.toLocale})"
-    log.trace(msg)
-
-    // trace stack trace
-    if (err != null) log.trace("> ${err.msg}", err)
+    log.trace(msg, err)
   }
 
   // TODO: not sure how this works yet

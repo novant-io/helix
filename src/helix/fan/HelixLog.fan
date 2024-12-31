@@ -24,8 +24,16 @@ internal const class HelixLog
   private const Actor actor := Actor(pool) |Obj obj->Obj?|
   {
     List msg := obj
-    echo(msg.first)
-    if (msg.getSafe(1) is Err) ((Err)msg[1]).trace
+    echo("> $msg.first")
+    if (msg.getSafe(1) is Err)
+    {
+      Err err := msg[1]
+      err.traceToStr.splitLines.each |line,i|
+      {
+        if (i == 0) echo("> ⮑  $line")
+        else        echo(">     $line")
+      }
+    }
     return null
   }
 }
