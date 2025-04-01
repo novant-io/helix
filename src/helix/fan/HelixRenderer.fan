@@ -126,7 +126,12 @@ class HelixRenderer
     res.statusCode = this.statusCode
     res.headers["Content-Type"] = "text/html; charset=utf-8"
     out := setupGzip
-    template(name).render(out, mergeData(data)) |Str p->Fanbars| { template(p) }
+    template(name).render(out, mergeData(data)) |Str p->Fanbars|
+    {
+      // TODO: not sure this works yet; but @nodoc allow
+      // templates to be specified in `data`
+      data[p] as Fanbars ?: template(p)
+    }
     out.flush.close
   }
 
