@@ -50,7 +50,14 @@ const class HelixArgs
           if (v != null) map.add(k, v)
         }
       }
-      catch (Err err) { throw IOErr("Invalid json", err) }
+      catch (Err err)
+      {
+        // this bubbles up from WispReq when req has no content body;
+        // trap and ignore since it is a bit of a nuisance error
+        ignore := false
+        if (err.msg == "Attempt to access WebReq.in with no content") ignore = true
+        if (!ignore) throw IOErr("Invalid json", err)
+      }
     }
     return HelixArgs(map)
   }
