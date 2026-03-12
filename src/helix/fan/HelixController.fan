@@ -56,7 +56,21 @@ abstract class HelixController
   ** Send a raw file response.
   virtual Void sendFile(File file)
   {
-    FileWeblet(file).onGet
+    extraResHeaders := null
+
+    // special handling for video files
+    if (file.ext == "mp4")
+    {
+      extraResHeaders = [
+        "Content-Type":  "video/mp4",  // TODO: was not added until 1.0.83+
+        "Accept-Ranges": "bytes",
+      ]
+    }
+
+    // delegate to fileweblet
+    w := FileWeblet(file)
+    w.extraResHeaders = extraResHeaders
+    w.onGet
   }
 
   ** Renderer instance for the current web request.
