@@ -192,6 +192,20 @@ const class HelixArgs
     optMap(name) ?: throw ArgErr("missing required argument '$name'")
   }
 
+  ** Get a required arg as 'Str:Str?' or throw error.
+  ** See `optNestedMap` for bracket notation.
+  Str:Str? reqNestedMap(Str name)
+  {
+    optNestedMap(name) ?: throw ArgErr("missing required argument '$name'")
+  }
+
+  ** Get a required arg as 'Obj?[]' or throw error.
+  ** See `optNestedList for bracket notation.
+  Obj?[] reqNestedList(Str name)
+  {
+    optNestedList(name) ?: throw ArgErr("missing required argument '$name'")
+  }
+
   ** Get a required file arg as 'File' or throw error.
   HelixFile reqFile(Str name)
   {
@@ -287,6 +301,150 @@ const class HelixArgs
     if (v == null) return null
     if (v isnot Map) throw ArgErr("invalid map value '${v}'")
     return v
+  }
+
+  **
+  ** Get an optional arg as a 'Str:Str?' or 'null' if not found.
+  ** Nested maps use a bracket notation:
+  **
+  **   foo[alpha]=x&foo[beta]=y
+  **
+  ** Where 'optNestedMap("foo")' returns '["alpha":"x", "beta":"y"]'.
+  **
+  ** NOTE: all values are normalized to 'Str' types. If pulling
+  ** from JSON content, the value will be converted to aa 'Str'
+  ** for consistency.
+  **
+  [Str:Str]? optNestedMap(Str name)
+  {
+    // check for JSON first
+    json := map[name]
+    if (json != null)
+    {
+      if (json isnot Map) throw ArgErr("invalid nested map value '${name}'")
+      res := Str:Str[:]
+      (json as Map).each |v,k| {
+        if (v != null) res[k] = v.toStr
+      }
+      return res
+    }
+
+    // else assume bracket notation
+    prefix := "${name}["
+    res    := Str:Str[:]
+    found := false
+    map.each |v, k|
+    {
+      if (!k.startsWith(prefix)) return
+      if (!k.endsWith("]")) throw ArgErr("invalid nested key '${k}'")
+      inner := k[prefix.size..-2]
+      if (inner.contains("[") || inner.contains("]"))
+        throw ArgErr("nested map does not support deeper nesting: '${k}'")
+      res.add(inner, v.toStr)
+      found = true
+    }
+    return found ? res : null
+  }
+
+  **
+  ** Get an optional arg as a 'Obj?[]' or 'null' if not found.
+  ** Nested lists use a bracket notation:
+  **
+  **   foo[0]=x&foo[1]=y        // list of scalars
+  **   bar[0][k]=v&bar[1][k]=w  // list of maps
+  **
+  ** Where 'optNestedList("foo")' returns '["x","y"]'
+  ** Where 'optNestedList("bar")' returns '[["k":"v"], ["k":"w"]]'
+  **
+  ** NOTE: all values are normalized to 'Str' types. If pulling
+  ** from JSON content, the value will be converted to aa 'Str'
+  ** for consistency.
+  **
+  Obj[]? optNestedList(Str name)
+  {
+    // check for JSON first
+    if (map[name] != null)
+    {
+      // check tyoe
+      json := map[name] as List
+      if (json == null) throw ArgErr("invalid nested list value '${name}'")
+
+      // short-circuit if empty
+      if (json.isEmpty) return Obj[]#.emptyList
+
+      isMap := json.first is Map
+      res   := Obj[,] { it.capacity = json.size }
+      json.each |item,i|
+      {
+        if (isMap)
+        {
+          if (item isnot Map) throw ArgErr("nested list '${name}' has mixed scalar/map elements at [${i}]")
+          row := Str:Str[:]
+          (item as Map).each |v, k| { if (v != null) row[k.toStr] = v.toStr }
+          res.add(row)
+        }
+        else
+        {
+          if (item is Map) throw ArgErr("nested list '${name}' has mixed scalar/map elements at [${i}]")
+          if (item == null) throw ArgErr("nested list '${name}' has null scalar element at [${i}]")
+          res.add(item.toStr)
+        }
+      }
+      return res
+    }
+
+    // else assume bracket notation; classify by element shape
+    prefix := "${name}["
+    Int:Obj? scalars := Int:Obj?[:]
+    Int:[Str:Str] groups := Int:[Str:Str][:]
+    found := false
+    map.each |v, k|
+    {
+      if (!k.startsWith(prefix)) return
+      found = true
+      rest := k[prefix.size..-1]  // "<i>]" or "<i>][<inner>]"
+      ci := rest.index("]")
+      if (ci == null) throw ArgErr("invalid nested list key '${k}'")
+      idx := rest[0..<ci].toInt(10, false)
+      if (idx == null || idx < 0)
+        throw ArgErr("invalid nested list index in '${k}'")
+      tail := rest[ci+1..-1]
+      if (tail.isEmpty)
+      {
+        if (scalars.containsKey(idx)) throw ArgErr("duplicate nested list key '${k}'")
+        scalars[idx] = v.toStr
+      }
+      else
+      {
+        if (!tail.startsWith("[") || !tail.endsWith("]"))
+          throw ArgErr("invalid nested list key '${k}'")
+        inner := tail[1..-2]
+        if (inner.contains("[") || inner.contains("]"))
+          throw ArgErr("nested list does not support deeper nesting: '${k}'")
+        row := groups[idx]
+        if (row == null)
+        {
+          row = Str:Str[:]
+          groups[idx] = row
+        }
+        row.add(inner, v.toStr)
+      }
+    }
+    if (!found) return null
+
+    if (!scalars.isEmpty && !groups.isEmpty)
+      throw ArgErr("nested list '${name}' has mixed scalar/map elements")
+
+    isScalar := !scalars.isEmpty
+    indices := (isScalar ? scalars.keys : groups.keys).sort
+    indices.each |i, n|
+    {
+      if (i != n) throw ArgErr("nested list '${name}' has sparse or non-zero-based indices: ${indices}")
+    }
+
+    Obj?[] res := Obj?[,] { it.capacity = indices.size }
+    indices.each |i| { res.add(isScalar ? scalars[i] : groups[i]) }
+    return res
   }
 
   ** Get an optional file arg as 'File' or 'null' if not found.

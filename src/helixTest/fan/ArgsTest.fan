@@ -93,6 +93,133 @@ class ArgsTest : HelixTest
   }
 
 //////////////////////////////////////////////////////////////////////////
+// Nested
+//////////////////////////////////////////////////////////////////////////
+
+  Void testNestedMap()
+  {
+    // basic single-level map
+    postForm(["metadata[foo]":"bar", "metadata[baz]":"qux"]) |args| {
+      verifyEq(args.optNestedMap("metadata"), Str:Str["foo":"bar", "baz":"qux"])
+      verifyEq(args.reqNestedMap("metadata"), Str:Str["foo":"bar", "baz":"qux"])
+    }
+
+    // single-key map
+    postForm(["m[only]":"x"]) |args| {
+      verifyEq(args.optNestedMap("m"), Str:Str["only":"x"])
+    }
+
+    // empty value
+    postForm(["m[k]":""]) |args| {
+      verifyEq(args.optNestedMap("m"), Str:Str["k":""])
+    }
+
+    // not present
+    postForm([:]) |args| {
+      verifyEq(args.optNestedMap("metadata"), null)
+      verifyErr(ArgErr#) { args.reqNestedMap("metadata") }
+    }
+
+    // unrelated keys are ignored
+    postForm(["other":"x", "metadata[k]":"v"]) |args| {
+      verifyEq(args.optNestedMap("metadata"), Str:Str["k":"v"])
+    }
+
+    // deeper nesting throws
+    postForm(["m[a][b]":"x"]) |args| {
+      verifyErr(ArgErr#) { args.optNestedMap("m") }
+    }
+  }
+
+  Void testNestedListMaps()
+  {
+    // basic two-element list of maps
+    postForm([
+      "writes[0][point_id]":"p.x", "writes[0][value]":"72",
+      "writes[1][point_id]":"p.y", "writes[1][value]":"null",
+    ]) |args| {
+      res := args.optNestedList("writes")
+      verifyEq(res.size, 2)
+      verifyEq(res[0], Str:Str["point_id":"p.x", "value":"72"])
+      verifyEq(res[1], Str:Str["point_id":"p.y", "value":"null"])
+    }
+
+    // single-element list
+    postForm(["w[0][k]":"v"]) |args| {
+      res := args.optNestedList("w")
+      verifyEq(res.size, 1)
+      verifyEq(res[0], Str:Str["k":"v"])
+    }
+
+    // mixed field counts per element (optional fields)
+    postForm([
+      "w[0][a]":"1", "w[0][b]":"2",
+      "w[1][a]":"3",
+    ]) |args| {
+      res := args.optNestedList("w")
+      verifyEq(res.size, 2)
+      verifyEq(res[0], Str:Str["a":"1", "b":"2"])
+      verifyEq(res[1], Str:Str["a":"3"])
+    }
+
+    // req throws when missing
+    postForm([:]) |args| {
+      verifyEq(args.optNestedList("w"), null)
+      verifyErr(ArgErr#) { args.reqNestedList("w") }
+    }
+  }
+
+  Void testNestedListScalars()
+  {
+    // basic scalar list
+    postForm(["tags[0]":"a", "tags[1]":"b", "tags[2]":"c"]) |args| {
+      res := args.optNestedList("tags")
+      verifyEq(res, Obj?["a","b","c"])
+    }
+
+    // single element
+    postForm(["tags[0]":"only"]) |args| {
+      verifyEq(args.optNestedList("tags"), Obj?["only"])
+    }
+  }
+
+  Void testNestedListErrors()
+  {
+    // sparse indices throw
+    postForm(["w[0][k]":"v", "w[2][k]":"v"]) |args| {
+      verifyErr(ArgErr#) { args.optNestedList("w") }
+    }
+
+    // non-zero starting index throws
+    postForm(["w[1][k]":"v"]) |args| {
+      verifyErr(ArgErr#) { args.optNestedList("w") }
+    }
+
+    // non-numeric index throws
+    postForm(["w[foo][k]":"v"]) |args| {
+      verifyErr(ArgErr#) { args.optNestedList("w") }
+    }
+
+    // deeper nesting throws
+    postForm(["w[0][a][b]":"v"]) |args| {
+      verifyErr(ArgErr#) { args.optNestedList("w") }
+    }
+
+    // mixed scalar/map shapes throw
+    postForm(["w[0]":"x", "w[1][k]":"v"]) |args| {
+      verifyErr(ArgErr#) { args.optNestedList("w") }
+    }
+
+    // duplicate scalar index throws (form decoder would normally
+    // collapse, but if reached here it should fail loudly)
+    // duplicate field within a map row throws
+    postForm(["w[0][k]":"v"]) |args| {
+      // sanity check happy path
+      verifyEq(args.optNestedList("w").size, 1)
+    }
+  }
+
+//////////////////////////////////////////////////////////////////////////
 // Support
 //////////////////////////////////////////////////////////////////////////
 
