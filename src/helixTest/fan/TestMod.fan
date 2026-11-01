@@ -58,6 +58,7 @@ const class TestMod : HelixMod
         ResRoute("/foo/bar/alpha.css", [`fan://helixTest/css/alpha.css`]),
       ]
     }
+    this.maxBodySize = 1024
   }
 
   Int bytesWritten() { _bytesWritten.val }

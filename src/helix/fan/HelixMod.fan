@@ -44,6 +44,15 @@ abstract const class HelixMod : WebMod
   **
   const Bool blockRobots := false
 
+  **
+  ** Largest request body to accept, in bytes, or 'null' for no limit.
+  ** Checked from the request headers before any of the body is read:
+  ** a 'Content-Length' over the limit is refused with '413', and a
+  ** body sent without one ('Transfer-Encoding') with '411', since its
+  ** size cannot be known up front.
+  **
+  const Int? maxBodySize := null
+
 //////////////////////////////////////////////////////////////////////////
 // Service
 //////////////////////////////////////////////////////////////////////////
@@ -81,6 +90,9 @@ abstract const class HelixMod : WebMod
         if (match == null) throw HelixErr(404)
         req.stash["helix.route"] = match.route
       }
+
+      // refuse an oversized body before reading it
+      checkBodySize
 
       // create and cache args
       args = HelixArgs(req, match.args)
@@ -120,6 +132,16 @@ abstract const class HelixMod : WebMod
       et := Duration.now
       traceReq(req, res, et-st, err)
     }
+  }
+
+  ** Refuse a request body over `maxBodySize`, from its headers.
+  private Void checkBodySize()
+  {
+    max := maxBodySize
+    if (max == null) return
+    len := req.headers["Content-Length"]?.toInt(10, false)
+    if (len == null && req.headers["Transfer-Encoding"] != null) throw HelixErr(411)
+    if (len != null && len > max) throw HelixErr(413)
   }
 
   ** Callback when an error occured during `onService`.
