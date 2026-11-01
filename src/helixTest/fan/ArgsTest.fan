@@ -6,6 +6,7 @@
 //   26 Sep 2022  Andy Frank  Creation
 //
 
+using concurrent
 using helix
 
 **
@@ -220,6 +221,27 @@ class ArgsTest : HelixTest
   }
 
 //////////////////////////////////////////////////////////////////////////
+// Uploads
+//////////////////////////////////////////////////////////////////////////
+
+  Void testUploadCleanup()
+  {
+    // the upload temp file is deleted once the request is done
+    verifyEq(upload(`/args/upload`), 200)
+    HelixFile f := ((HelixArgs)TestController.argsRef.val).reqFile("file")
+    verifyEq(f.name, "a.csv")
+    verifyDeleted(f.temp)
+  }
+
+  Void testUploadCleanupOnErr()
+  {
+    // and also when the request fails
+    verifyEq(upload(`/args/upload/err`), 401)
+    HelixFile f := ((HelixArgs)TestController.argsRef.val).reqFile("file")
+    verifyDeleted(f.temp)
+  }
+
+//////////////////////////////////////////////////////////////////////////
 // Support
 //////////////////////////////////////////////////////////////////////////
 
@@ -237,6 +259,30 @@ class ArgsTest : HelixTest
     // echo("---> " + TestController.argsMapRef.val)
     Str:Obj temp := Str:Obj[:].addAll(expected)  // stupid type inference
     verifyEq(TestController.argsMapRef.val, temp)
+  }
+
+  ** Verify 'f' is deleted; cleanup runs after the response is sent,
+  ** so allow it a moment.
+  private Void verifyDeleted(File f)
+  {
+    100.times { if (f.exists) Actor.sleep(10ms) }
+    verifyFalse(f.exists)
+  }
+
+  ** POST a multipart form with one file 'a.csv'; return the status.
+  private Int upload(Uri uri)
+  {
+    body := "--xb\r\n" +
+            "Content-Disposition: form-data; name=\"file\"; filename=\"a.csv\"\r\n" +
+            "Content-Type: text/csv\r\n\r\n" +
+            "a,b\r\n" +
+            "--xb--\r\n"
+    c := client(uri)
+    c.reqHeaders["Content-Type"] = "multipart/form-data; boundary=xb"
+    c.postStr(body)
+    code := c.resCode
+    c.close
+    return code
   }
 
   private Void postForm(Str:Str form, |HelixArgs args| f)

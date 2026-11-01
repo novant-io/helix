@@ -59,6 +59,7 @@ abstract const class HelixMod : WebMod
   {
     st := Duration.now
     HelixErr? err
+    HelixArgs? args
     try
     {
       // set mod
@@ -82,7 +83,7 @@ abstract const class HelixMod : WebMod
       }
 
       // create and cache args
-      args := HelixArgs(req, match.args)
+      args = HelixArgs(req, match.args)
       Actor.locals["helix.args"] = args
 
       // allow pre-service
@@ -97,9 +98,6 @@ abstract const class HelixMod : WebMod
 
       // allow post-service
       onAfterService(match.route, args)
-
-      // cleanup
-      args.cleanup
     }
     catch (Err origErr)
     {
@@ -115,6 +113,9 @@ abstract const class HelixMod : WebMod
     }
     finally
     {
+      // always delete upload temp files, even if the request failed
+      args?.cleanup
+
       // trace request
       et := Duration.now
       traceReq(req, res, et-st, err)

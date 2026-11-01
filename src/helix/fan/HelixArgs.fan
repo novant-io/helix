@@ -90,9 +90,9 @@ const class HelixArgs
   ** Cleanup after request has been serviced.
   internal Void cleanup()
   {
-    // delete any temp files not moved
+    // delete any upload temp files not moved
     map.each |v| {
-      if (v is File) ((File)v).delete
+      if (v is HelixFile) ((HelixFile)v).temp.delete
     }
   }
 

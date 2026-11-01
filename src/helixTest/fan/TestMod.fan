@@ -40,6 +40,8 @@ const class TestMod : HelixMod
         Route("/args/form",              "POST", TestController#argTest),
         Route("/args/form/{foo}",        "POST", TestController#argTest),
         Route("/args/form/{foo}/{bar}",  "POST", TestController#argTest),
+        Route("/args/upload",            "POST", TestController#argTest),
+        Route("/args/upload/err",        "POST", TestController#argErr),
 
         // templates
         Route("/",        "GET", TestController#index),
@@ -111,6 +113,13 @@ class TestController : HelixController
     TestController.argsRef.val    = this.args
     TestController.argsMapRef.val = this.args->map
     renderer.renderText("ok")
+  }
+
+  ** Capture args like 'argTest', then fail the request.
+  Void argErr()
+  {
+    TestController.argsRef.val = this.args
+    throw HelixErr(401)
   }
 
   // templates
