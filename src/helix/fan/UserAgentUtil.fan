@@ -45,7 +45,7 @@
     // TODO: really bad; but test first char for perfomrance
     // os/device
     Str? os
-    switch (m.comment?.getSafe(0))
+    switch (m.comment?.getSafe(0) ?: 0)
     {
       case 'M': os = "macOS"
       case 'i': os = "iOS"

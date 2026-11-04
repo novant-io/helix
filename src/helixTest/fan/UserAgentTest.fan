@@ -72,6 +72,15 @@ class UserAgentTest : Test
       ["bar", null, null],
       ["zar", "3", null]
     ])
+
+    // mozilla with no comment
+    ua = UserAgent("Mozilla/5.0")
+    verifyEq(ua.browser, null)
+    verifyUA(ua, [["Mozilla", "5.0", null]])
+
+    // mozilla with no comment (browser)
+    ua = UserAgent("Mozilla/5.0 Chrome/124.0.0.0")
+    verifyEq(ua.browser.toStr, "Chrome 124.0.0.0")
   }
 
   Void testBrowser()
